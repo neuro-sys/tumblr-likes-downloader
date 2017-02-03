@@ -12,34 +12,60 @@ import (
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
+	"github.com/go-ini/ini"
 	"github.com/headzoo/surf"
 )
 
-const username = ""
-const password = ""
+var (
+	username       string
+	password       string
+	blogIdentifier string
+	consumerKey    string
+	consumerSecret string
+	callbackURL    string
 
-const blogIdentifier = ""
-
-const consumerKey = ""
-const consumerSecret = ""
-const callbackURL = "http://localhost/tumblr/callback"
-
-var config = oauth1.Config{
-	ConsumerKey:    consumerKey,
-	ConsumerSecret: consumerSecret,
-	CallbackURL:    callbackURL,
-	Endpoint: oauth1.Endpoint{
-		RequestTokenURL: "https://www.tumblr.com/oauth/request_token",
-		AuthorizeURL:    "https://www.tumblr.com/oauth/authorize",
-		AccessTokenURL:  "https://www.tumblr.com/oauth/access_token",
-	},
-}
+	config oauth1.Config
+)
 
 func checkError(err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func initOauthConfig() {
+	config = oauth1.Config{
+		ConsumerKey:    consumerKey,
+		ConsumerSecret: consumerSecret,
+		CallbackURL:    callbackURL,
+		Endpoint: oauth1.Endpoint{
+			RequestTokenURL: "https://www.tumblr.com/oauth/request_token",
+			AuthorizeURL:    "https://www.tumblr.com/oauth/authorize",
+			AccessTokenURL:  "https://www.tumblr.com/oauth/access_token",
+		},
+	}
+}
+
+func getConfigValue(cfg *ini.File, key string) string {
+	value, err := cfg.Section("").GetKey(key)
+	checkError(err)
+	if value.String() == "" {
+		checkError(errors.New(key + " is missing"))
+	}
+	return value.String()
+}
+
+func loadConfig() {
+	cfg, err := ini.Load("tumblr-downloader.config")
+	checkError(err)
+
+	username = getConfigValue(cfg, "USERNAME")
+	password = getConfigValue(cfg, "PASSWORD")
+	blogIdentifier = getConfigValue(cfg, "BLOG_IDENTIFIER")
+	consumerKey = getConfigValue(cfg, "CONSUMER_KEY")
+	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
+	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
 }
 
 func authTumblr() *http.Client {
@@ -102,6 +128,9 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 }
 
 func main() {
+	loadConfig()
+	initOauthConfig()
+
 	httpClient := authTumblr()
 	lastTimestamp := 0
 
