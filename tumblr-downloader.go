@@ -4,11 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/net/context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
@@ -127,7 +130,25 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 	return parser
 }
 
+func downloadURL(URL string) {
+	resp, err := http.Get(URL)
+	checkError(err)
+
+	tokens := strings.Split(URL, "/")
+	fileName := tokens[len(tokens)-1]
+
+	folderName := "downloaded_" + time.Now().String()
+	os.Mkdir(folderName, os.ModePerm)
+
+	outFile, err := os.Create(folderName + "/" + fileName)
+	checkError(err)
+
+	defer outFile.Close()
+	_, err = io.Copy(outFile, resp.Body)
+}
+
 func main() {
+
 	loadConfig()
 	initOauthConfig()
 
@@ -157,7 +178,9 @@ func main() {
 
 			lastTimestamp = int(lastTimestampString.(float64))
 
-			fmt.Println(counter, url)
+			fmt.Println(url)
+
+			downloadURL(url.(string))
 
 			counter += 1
 		}
