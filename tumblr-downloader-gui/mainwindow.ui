@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>857</width>
-    <height>564</height>
+    <width>873</width>
+    <height>548</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,20 +20,23 @@
       <x>30</x>
       <y>10</y>
       <width>818</width>
-      <height>446</height>
+      <height>474</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr Downloader&lt;/span&gt; is an application that authenticates to your tumblr account, and downloads all the liked photos to your computer.&lt;/p&gt;&lt;p&gt;In order to do this you need to register an application on the official tumblr website using the following link: &lt;a href=&quot;https://www.tumblr.com/oauth/apps&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/oauth/apps&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;Once you have done that, fill the configuration parameters accordingly below. Detailed information regarding &lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr API&lt;/span&gt; is found here: &lt;a href=&quot;https://www.tumblr.com/docs/en/api/v2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/docs/en/api/v2&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr Downloader&lt;/span&gt; is an application that authenticates to your tumblr account, and downloads all the liked photos to your computer.&lt;/p&gt;&lt;p&gt;In order to do this you need to register an application on the official tumblr website using the following link: &lt;a href=&quot;https://www.tumblr.com/oauth/apps&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/oauth/apps&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You should set the following fields as follows if you don't know what to set them as:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Application Website&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost/tumblr&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Default Callback URL&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost/tumblr/callback&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Once you have done that, fill the configuration parameters accordingly below. Detailed information regarding &lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr API&lt;/span&gt; is found here: &lt;a href=&quot;https://www.tumblr.com/docs/en/api/v2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/docs/en/api/v2&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="wordWrap">
         <bool>true</bool>
        </property>
        <property name="margin">
         <number>0</number>
+       </property>
+       <property name="openExternalLinks">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -149,6 +152,9 @@
          </item>
          <item row="6" column="0">
           <widget class="QLabel" name="defaultCallbackURLLabel">
+           <property name="whatsThis">
+            <string/>
+           </property>
            <property name="text">
             <string>Default Callback URL</string>
            </property>
@@ -202,7 +208,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>857</width>
+     <width>873</width>
      <height>30</height>
     </rect>
    </property>
