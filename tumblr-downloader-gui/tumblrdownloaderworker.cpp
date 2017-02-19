@@ -11,7 +11,7 @@ TumblrDownloaderWorker::TumblrDownloaderWorker(QObject *parent) : QObject(parent
 void TumblrDownloaderWorker::run()
 {
     this->running = true;
-    QProcess *process = new QProcess();
+    QProcess *process = new QProcess(this);
     QDir dir;
     process->setWorkingDirectory(dir.absolutePath());
 #ifdef Q_WS_WIN
@@ -31,5 +31,6 @@ void TumblrDownloaderWorker::run()
         buf[0] = 0;
     } while (!process->waitForFinished(100) && running);
 
+    process->kill();
     emit receiveTumblrImageURLFinished();
 }
