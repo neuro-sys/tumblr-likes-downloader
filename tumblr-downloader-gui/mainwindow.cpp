@@ -52,6 +52,8 @@ void MainWindow::saveSettings()
     settings->setValue("CONSUMER_KEY", ui->consumerKeyLineEdit->text());
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
     settings->setValue("CALLBACK_URL", ui->defaultCallbackURLLineEdit->text());
+
+    settings->sync();
 }
 
 void MainWindow::on_pushButton_clicked()
