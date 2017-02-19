@@ -31,11 +31,13 @@ var (
   outputFolderName string
 )
 
-func checkError(err error) {
+func checkError(err error) bool {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+
+  return err != nil
 }
 
 func initOauthConfig() {
@@ -168,7 +170,7 @@ func main() {
 		parser := tumblrGetLikes(httpClient, blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
-		checkError(err)
+    checkError(err)
 
 		for _, v := range likedPosts {
 			postType, err := gojq.NewQuery(v).Query("type")
