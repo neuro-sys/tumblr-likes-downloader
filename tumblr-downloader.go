@@ -178,17 +178,21 @@ func main() {
 				continue
 			}
 
-			url, err := gojq.NewQuery(v).Query("photos.[0].original_size.url")
-			checkError(err)
-
 			lastTimestampString, err := gojq.NewQuery(v).Query("liked_timestamp")
 			checkError(err)
 
 			lastTimestamp = int(lastTimestampString.(float64))
 
-			fmt.Println(url)
+      postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
+      checkError(err)
 
-			downloadURL(url.(string))
+      for _, v2 := range postPhotos {
+        url, err := gojq.NewQuery(v2).Query("original_size.url")
+        checkError(err)
+
+        fmt.Println(url)
+        downloadURL(url.(string))
+      }
 
 			counter += 1
 		}
