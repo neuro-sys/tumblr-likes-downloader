@@ -60,8 +60,7 @@ void MainWindow::on_pushButton_clicked()
     if (this->thread->isRunning()) {
         tumblrDownloaderWorker->running = false;
         this->thread->quit();
-        ui->statusTextArea->appendPlainText("* Terminated...");
-        std::cout << "* Terminated..." << std::endl;
+        ui->statusTextArea->appendPlainText("* Canceled...");
         ui->pushButton->setText("Download");
     } else {
         saveSettings();
@@ -73,10 +72,11 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::receiveTumblrImageURL(const QString &imgURL)
 {
     ui->statusTextArea->appendPlainText(imgURL);
-    std::cout << imgURL.toStdString().c_str() << std::endl;
 }
 
 void MainWindow::receiveTumblrImageURLFinished()
 {
-
+    ui->statusTextArea->appendPlainText("* Download finished...");
+    ui->pushButton->setText("Download");
 }
+
