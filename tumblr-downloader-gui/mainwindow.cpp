@@ -6,6 +6,7 @@
 #include <QThread>
 #include <iostream>
 #include <QSettings>
+#include <QCloseEvent>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -28,6 +29,21 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    if (this->thread->isRunning()) {
+        tumblrDownloaderWorker->running = false;
+        ui->pushButton->setText("Cancelling...");
+        ui->statusTextArea->appendPlainText("* Cancelling...");
+        this->thread->quit();
+        qApp->processEvents();
+        this->thread->wait();
+    }
+
+    saveSettings();
+    event->accept();
 }
 
 
@@ -60,8 +76,11 @@ void MainWindow::on_pushButton_clicked()
 {
     if (this->thread->isRunning()) {
         tumblrDownloaderWorker->running = false;
-        this->thread->quit();
+        ui->pushButton->setText("Cancelling...");
         ui->statusTextArea->appendPlainText("* Cancelling...");
+        this->thread->quit();
+        qApp->processEvents();
+        this->thread->wait();
         ui->pushButton->setText("Download");
     } else {
         saveSettings();
@@ -82,5 +101,6 @@ void MainWindow::receiveTumblrImageURLFinished()
     ui->pushButton->setText("Download");
     this->tumblrDownloaderWorker->running = false;
     this->thread->quit();
+    this->thread->wait();
 }
 
