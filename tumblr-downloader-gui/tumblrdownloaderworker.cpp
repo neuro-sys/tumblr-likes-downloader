@@ -30,4 +30,6 @@ void TumblrDownloaderWorker::run()
         }
         buf[0] = 0;
     } while (!process->waitForFinished(100) && running);
+
+    emit receiveTumblrImageURLFinished();
 }

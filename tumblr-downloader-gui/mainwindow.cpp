@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(thread, SIGNAL(started()), tumblrDownloaderWorker, SLOT(run()));
     connect(tumblrDownloaderWorker, SIGNAL(emitImageURL(QString)), this, SLOT(receiveTumblrImageURL(QString)));
-    connect(tumblrDownloaderWorker, SIGNAL(receiveTumblrImageURLFinished()), thread, SLOT(quit()) );
+    connect(tumblrDownloaderWorker, SIGNAL(receiveTumblrImageURLFinished()), this, SLOT(receiveTumblrImageURLFinished()) );
     connect(tumblrDownloaderWorker, SIGNAL(finished()), thread, SLOT(quit()) );
 
     loadSettings();
@@ -60,12 +60,13 @@ void MainWindow::on_pushButton_clicked()
     if (this->thread->isRunning()) {
         tumblrDownloaderWorker->running = false;
         this->thread->quit();
-        ui->statusTextArea->appendPlainText("* Canceled...");
+        ui->statusTextArea->appendPlainText("* Cancelling...");
         ui->pushButton->setText("Download");
     } else {
         saveSettings();
         thread->start();
         ui->pushButton->setText("Cancel");
+        ui->statusTextArea->appendPlainText("* Starting...");
     }
 }
 
@@ -76,7 +77,9 @@ void MainWindow::receiveTumblrImageURL(const QString &imgURL)
 
 void MainWindow::receiveTumblrImageURLFinished()
 {
-    ui->statusTextArea->appendPlainText("* Download finished...");
+    ui->statusTextArea->appendPlainText("* Finished...");
     ui->pushButton->setText("Download");
+    this->tumblrDownloaderWorker->running = false;
+    this->thread->quit();
 }
 
