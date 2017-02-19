@@ -28,6 +28,8 @@ var (
 	callbackURL    string
 
 	config oauth1.Config
+
+  outputFolderName string
 )
 
 func checkError(err error) {
@@ -69,6 +71,8 @@ func loadConfig() {
 	consumerKey = getConfigValue(cfg, "CONSUMER_KEY")
 	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
 	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
+
+  outputFolderName = "downloaded_" + time.Now().String()
 }
 
 func authTumblr() *http.Client {
@@ -137,10 +141,9 @@ func downloadURL(URL string) {
 	tokens := strings.Split(URL, "/")
 	fileName := tokens[len(tokens)-1]
 
-	folderName := "downloaded_" + time.Now().String()
-	os.Mkdir(folderName, os.ModePerm)
+	os.Mkdir(outputFolderName, os.ModePerm)
 
-	outFile, err := os.Create(folderName + "/" + fileName)
+	outFile, err := os.Create(outputFolderName + "/" + fileName)
 	checkError(err)
 
 	defer outFile.Close()
