@@ -40,7 +40,7 @@ void MainWindow::loadSettings()
     ui->blogNameLineEdit->setText(settings->value("BLOG_IDENTIFIER").toString());
     ui->consumerKeyLineEdit->setText(settings->value("CONSUMER_KEY").toString());
     ui->consumerSecretLineEdit->setText(settings->value("CONSUMER_SECRET").toString());
-    ui->defaultCallbackURLLineEdit->setText(settings->value("CALLBACK_URL").toString());
+    //ui->defaultCallbackURLLineEdit->setText(settings->value("CALLBACK_URL").toString());
 
 }
 
@@ -51,7 +51,7 @@ void MainWindow::saveSettings()
     settings->setValue("BLOG_IDENTIFIER", ui->blogNameLineEdit->text());
     settings->setValue("CONSUMER_KEY", ui->consumerKeyLineEdit->text());
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
-    settings->setValue("CALLBACK_URL", ui->defaultCallbackURLLineEdit->text());
+    settings->setValue("CALLBACK_URL", "http://localhost/tumblr/callback");
 
     settings->sync();
 }
