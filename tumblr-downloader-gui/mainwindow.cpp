@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(thread, SIGNAL(started()), tumblrDownloaderWorker, SLOT(run()));
     connect(tumblrDownloaderWorker, SIGNAL(emitImageURL(QString)), this, SLOT(receiveTumblrImageURL(QString)));
     connect(tumblrDownloaderWorker, SIGNAL(receiveTumblrImageURLFinished()), this, SLOT(receiveTumblrImageURLFinished()) );
-    connect(tumblrDownloaderWorker, SIGNAL(finished()), thread, SLOT(quit()) );
 
     loadSettings();
 }
