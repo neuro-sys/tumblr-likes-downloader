@@ -28,7 +28,7 @@ var (
 
 	config oauth1.Config
 
-  outputFolderName string
+	outputFolderName string
 )
 
 func checkError(err error) bool {
@@ -37,7 +37,7 @@ func checkError(err error) bool {
 		os.Exit(1)
 	}
 
-  return err != nil
+	return err != nil
 }
 
 func initOauthConfig() {
@@ -73,7 +73,7 @@ func loadConfig() {
 	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
 	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
 
-  outputFolderName = blogIdentifier
+	outputFolderName = blogIdentifier
 }
 
 func authTumblr() *http.Client {
@@ -144,17 +144,17 @@ func downloadURL(URL string) {
 
 	os.Mkdir(outputFolderName, os.ModePerm)
 
-  outputFilePath := outputFolderName + "/" + fileName
+	outputFilePath := outputFolderName + "/" + fileName
 
-  if _, err = os.Stat(outputFilePath); os.IsNotExist(err) {
-    outFile, err := os.Create(outputFilePath)
-    checkError(err)
+	if _, err = os.Stat(outputFilePath); os.IsNotExist(err) {
+		outFile, err := os.Create(outputFilePath)
+		checkError(err)
 
-    defer outFile.Close()
-    _, err = io.Copy(outFile, resp.Body)
-  } else {
-    fmt.Println("File already exists, skipping.")
-  }
+		defer outFile.Close()
+		_, err = io.Copy(outFile, resp.Body)
+	} else {
+		fmt.Println("File already exists, skipping.")
+	}
 }
 
 func main() {
@@ -170,7 +170,7 @@ func main() {
 		parser := tumblrGetLikes(httpClient, blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
-    checkError(err)
+		checkError(err)
 
 		for _, v := range likedPosts {
 			postType, err := gojq.NewQuery(v).Query("type")
@@ -185,16 +185,16 @@ func main() {
 
 			lastTimestamp = int(lastTimestampString.(float64))
 
-      postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
-      checkError(err)
+			postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
+			checkError(err)
 
-      for _, v2 := range postPhotos {
-        url, err := gojq.NewQuery(v2).Query("original_size.url")
-        checkError(err)
+			for _, v2 := range postPhotos {
+				url, err := gojq.NewQuery(v2).Query("original_size.url")
+				checkError(err)
 
-        fmt.Println(url)
-        downloadURL(url.(string))
-      }
+				fmt.Println(url)
+				downloadURL(url.(string))
+			}
 
 			counter += 1
 		}
