@@ -176,14 +176,14 @@ func main() {
 			postType, err := gojq.NewQuery(v).Query("type")
 			checkError(err)
 
-			if postType != "photo" {
-				continue
-			}
-
 			lastTimestampString, err := gojq.NewQuery(v).Query("liked_timestamp")
 			checkError(err)
 
 			lastTimestamp = int(lastTimestampString.(float64))
+
+			if postType != "photo" {
+				continue
+			}
 
 			postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
 			checkError(err)
