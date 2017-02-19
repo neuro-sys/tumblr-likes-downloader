@@ -51,7 +51,7 @@ func initOauthConfig() {
 }
 
 func getConfigValue(cfg *ini.File, key string) string {
-	value, err := cfg.Section("").GetKey(key)
+	value, err := cfg.Section("General").GetKey(key)
 	checkError(err)
 	if value.String() == "" {
 		checkError(errors.New(key + " is missing"))

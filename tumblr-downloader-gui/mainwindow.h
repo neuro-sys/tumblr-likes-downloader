@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QSettings>
+
 #include "tumblrdownloaderworker.h"
 
 namespace Ui {
@@ -21,15 +23,16 @@ public slots:
     void receiveTumblrImageURLFinished();
 
 private slots:
-
-    void on_blogNameLineEdit_textChanged(const QString &arg1);
-
     void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;
     QThread *thread;
     TumblrDownloaderWorker *tumblrDownloaderWorker;
+    QSettings *settings;
+
+    void saveSettings();
+    void loadSettings();
 };
 
 #endif // MAINWINDOW_H
