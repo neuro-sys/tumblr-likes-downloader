@@ -4,11 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"golang.org/x/net/context"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
@@ -25,6 +28,8 @@ var (
 	callbackURL    string
 
 	config oauth1.Config
+
+  outputFolderName string
 )
 
 func checkError(err error) {
@@ -48,7 +53,7 @@ func initOauthConfig() {
 }
 
 func getConfigValue(cfg *ini.File, key string) string {
-	value, err := cfg.Section("").GetKey(key)
+	value, err := cfg.Section("General").GetKey(key)
 	checkError(err)
 	if value.String() == "" {
 		checkError(errors.New(key + " is missing"))
@@ -66,6 +71,8 @@ func loadConfig() {
 	consumerKey = getConfigValue(cfg, "CONSUMER_KEY")
 	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
 	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
+
+  outputFolderName = "downloaded_" + time.Now().String()
 }
 
 func authTumblr() *http.Client {
@@ -127,7 +134,24 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 	return parser
 }
 
+func downloadURL(URL string) {
+	resp, err := http.Get(URL)
+	checkError(err)
+
+	tokens := strings.Split(URL, "/")
+	fileName := tokens[len(tokens)-1]
+
+	os.Mkdir(outputFolderName, os.ModePerm)
+
+	outFile, err := os.Create(outputFolderName + "/" + fileName)
+	checkError(err)
+
+	defer outFile.Close()
+	_, err = io.Copy(outFile, resp.Body)
+}
+
 func main() {
+
 	loadConfig()
 	initOauthConfig()
 
@@ -157,7 +181,9 @@ func main() {
 
 			lastTimestamp = int(lastTimestampString.(float64))
 
-			fmt.Println(counter, url)
+			fmt.Println(url)
+
+			downloadURL(url.(string))
 
 			counter += 1
 		}
