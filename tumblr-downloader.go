@@ -11,7 +11,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
@@ -72,7 +71,7 @@ func loadConfig() {
 	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
 	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
 
-  outputFolderName = "downloaded_" + time.Now().String()
+  outputFolderName = blogIdentifier
 }
 
 func authTumblr() *http.Client {
@@ -143,11 +142,17 @@ func downloadURL(URL string) {
 
 	os.Mkdir(outputFolderName, os.ModePerm)
 
-	outFile, err := os.Create(outputFolderName + "/" + fileName)
-	checkError(err)
+  outputFilePath := outputFolderName + "/" + fileName
 
-	defer outFile.Close()
-	_, err = io.Copy(outFile, resp.Body)
+  if _, err = os.Stat(outputFilePath); os.IsNotExist(err) {
+    outFile, err := os.Create(outputFilePath)
+    checkError(err)
+
+    defer outFile.Close()
+    _, err = io.Copy(outFile, resp.Body)
+  } else {
+    fmt.Println("File already exists, skipping.")
+  }
 }
 
 func main() {
