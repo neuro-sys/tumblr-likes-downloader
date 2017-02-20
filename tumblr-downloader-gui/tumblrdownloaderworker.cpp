@@ -2,7 +2,7 @@
 
 #include <QProcess>
 #include <iostream>
-#include <QDir>
+#include <QCoreApplication>
 
 TumblrDownloaderWorker::TumblrDownloaderWorker(QObject *parent) : QObject(parent)
 {
@@ -17,8 +17,11 @@ TumblrDownloaderWorker::~TumblrDownloaderWorker()
 void TumblrDownloaderWorker::run()
 {
     this->running = true;
-    QDir dir;
-    process->setWorkingDirectory(dir.absolutePath());
+#ifdef Q_WS_MAC
+    process->setWorkingDirectory(QCoreApplication::applicationDirPath() + "/../Resources");
+#else
+    process->setWorkingDirectory(QCoreApplication::applicationDirPath());
+#endif
 #ifdef Q_WS_WIN
     process->start("./tumblr-downloader.exe");
 #else
