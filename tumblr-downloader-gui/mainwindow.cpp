@@ -7,6 +7,7 @@
 #include <iostream>
 #include <QSettings>
 #include <QCloseEvent>
+#include <QProcessEnvironment>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -49,7 +50,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::loadSettings()
 {
-    settings = new QSettings ("tumblr-downloader.config", QSettings::IniFormat);
+    settings = new QSettings ("Tumblr Downloader", "Tumblr Downloader");
 
     ui->userNameLineEdit->setText(settings->value("USERNAME").toString());
     ui->passwordLineEdit->setText(settings->value("PASSWORD").toString());
@@ -67,9 +68,17 @@ void MainWindow::saveSettings()
     settings->setValue("BLOG_IDENTIFIER", ui->blogNameLineEdit->text());
     settings->setValue("CONSUMER_KEY", ui->consumerKeyLineEdit->text());
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
-    settings->setValue("CALLBACK_URL", "http://localhost/tumblr/callback");
+    //settings->setValue("CALLBACK_URL", "http://localhost/tumblr/callback");
 
     settings->sync();
+
+    qputenv("USERNAME", ui->userNameLineEdit->text().toStdString().c_str());
+    qputenv("PASSWORD", ui->passwordLineEdit->text().toStdString().c_str());
+    qputenv("BLOG_IDENTIFIER", ui->blogNameLineEdit->text().toStdString().c_str());
+    qputenv("CONSUMER_KEY", ui->consumerKeyLineEdit->text().toStdString().c_str());
+    qputenv("CONSUMER_SECRET", ui->consumerSecretLineEdit->text().toStdString().c_str());
+    qputenv("CALLBACK_URL", "http://localhost/tumblr/callback");
+
 }
 
 void MainWindow::on_pushButton_clicked()

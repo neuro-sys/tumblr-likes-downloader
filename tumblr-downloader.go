@@ -14,7 +14,6 @@ import (
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
-	"github.com/go-ini/ini"
 	"github.com/headzoo/surf"
 )
 
@@ -53,25 +52,22 @@ func initOauthConfig() {
 	}
 }
 
-func getConfigValue(cfg *ini.File, key string) string {
-	value, err := cfg.Section("General").GetKey(key)
-	checkError(err)
-	if value.String() == "" {
+func getConfigValue(key string) string {
+	value := os.Getenv(key)
+
+	if value == "" {
 		checkError(errors.New(key + " is missing"))
 	}
-	return value.String()
+	return value
 }
 
 func loadConfig() {
-	cfg, err := ini.Load("tumblr-downloader.config")
-	checkError(err)
-
-	username = getConfigValue(cfg, "USERNAME")
-	password = getConfigValue(cfg, "PASSWORD")
-	blogIdentifier = getConfigValue(cfg, "BLOG_IDENTIFIER")
-	consumerKey = getConfigValue(cfg, "CONSUMER_KEY")
-	consumerSecret = getConfigValue(cfg, "CONSUMER_SECRET")
-	callbackURL = getConfigValue(cfg, "CALLBACK_URL")
+	username = getConfigValue("USERNAME")
+	password = getConfigValue("PASSWORD")
+	blogIdentifier = getConfigValue("BLOG_IDENTIFIER")
+	consumerKey = getConfigValue("CONSUMER_KEY")
+	consumerSecret = getConfigValue("CONSUMER_SECRET")
+	callbackURL = getConfigValue("CALLBACK_URL")
 
 	outputFolderName = blogIdentifier
 }
@@ -158,7 +154,6 @@ func downloadURL(URL string) {
 }
 
 func main() {
-
 	loadConfig()
 	initOauthConfig()
 
