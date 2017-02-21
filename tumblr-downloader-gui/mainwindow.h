@@ -18,6 +18,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void closeEvent(QCloseEvent *event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 public slots:
     void receiveTumblrImageURL(const QString &imgURL);

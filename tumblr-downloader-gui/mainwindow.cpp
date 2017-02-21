@@ -8,6 +8,7 @@
 #include <QSettings>
 #include <QCloseEvent>
 #include <QProcessEnvironment>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -25,6 +26,11 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(tumblrDownloaderWorker, SIGNAL(receiveTumblrImageURLFinished()), this, SLOT(receiveTumblrImageURLFinished()) );
 
     loadSettings();
+
+    ui->targetLocationLineEdit->installEventFilter(this);
+    if (ui->targetLocationLineEdit->text().isEmpty()) {
+        ui->targetLocationLineEdit->setText(QCoreApplication::applicationDirPath());
+    }
 }
 
 MainWindow::~MainWindow()
@@ -58,7 +64,7 @@ void MainWindow::loadSettings()
     ui->consumerKeyLineEdit->setText(settings->value("CONSUMER_KEY").toString());
     ui->consumerSecretLineEdit->setText(settings->value("CONSUMER_SECRET").toString());
     //ui->defaultCallbackURLLineEdit->setText(settings->value("CALLBACK_URL").toString());
-
+    ui->targetLocationLineEdit->setText(settings->value("TARGET_LOCATION").toString());
 }
 
 void MainWindow::saveSettings()
@@ -69,7 +75,7 @@ void MainWindow::saveSettings()
     settings->setValue("CONSUMER_KEY", ui->consumerKeyLineEdit->text());
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
     //settings->setValue("CALLBACK_URL", "http://localhost/tumblr/callback");
-
+    settings->setValue("TARGET_LOCATION", ui->targetLocationLineEdit->text());
     settings->sync();
 
     qputenv("USERNAME", ui->userNameLineEdit->text().toStdString().c_str());
@@ -78,7 +84,7 @@ void MainWindow::saveSettings()
     qputenv("CONSUMER_KEY", ui->consumerKeyLineEdit->text().toStdString().c_str());
     qputenv("CONSUMER_SECRET", ui->consumerSecretLineEdit->text().toStdString().c_str());
     qputenv("CALLBACK_URL", "http://localhost/tumblr/callback");
-
+    qputenv("TARGET_LOCATION", ui->targetLocationLineEdit->text().toStdString().c_str());
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -111,5 +117,15 @@ void MainWindow::receiveTumblrImageURLFinished()
     this->tumblrDownloaderWorker->running = false;
     this->thread->quit();
     this->thread->wait();
+}
+
+bool MainWindow::eventFilter(QObject* object, QEvent* event)
+{
+    if(object == ui->targetLocationLineEdit && event->type() == QEvent::MouseButtonRelease) {
+        QString path = QFileDialog::getExistingDirectory (this, "Target Destination");
+        if (path != NULL && !path.isEmpty()) {
+            ui->targetLocationLineEdit->setText(path);
+        }
+    }
 }
 
