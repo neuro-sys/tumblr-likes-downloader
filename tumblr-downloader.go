@@ -69,7 +69,7 @@ func loadConfig() {
 	consumerSecret = getConfigValue("CONSUMER_SECRET")
 	callbackURL = getConfigValue("CALLBACK_URL")
 
-	outputFolderName = blogIdentifier
+	outputFolderName = getConfigValue("TARGET_LOCATION") + string(os.PathSeparator) + blogIdentifier
 }
 
 func authTumblr() *http.Client {
@@ -140,7 +140,7 @@ func downloadURL(URL string) {
 
 	os.Mkdir(outputFolderName, os.ModePerm)
 
-	outputFilePath := outputFolderName + "/" + fileName
+	outputFilePath := outputFolderName + string(os.PathSeparator) + fileName
 
 	if _, err = os.Stat(outputFilePath); os.IsNotExist(err) {
 		outFile, err := os.Create(outputFilePath)
