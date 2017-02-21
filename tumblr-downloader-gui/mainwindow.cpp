@@ -125,7 +125,10 @@ bool MainWindow::eventFilter(QObject* object, QEvent* event)
         QString path = QFileDialog::getExistingDirectory (this, "Target Destination");
         if (path != NULL && !path.isEmpty()) {
             ui->targetLocationLineEdit->setText(path);
+            return true;
         }
     }
+
+    return false;
 }
 
