@@ -31,3 +31,6 @@ HEADERS  += mainwindow.h \
     tumblrdownloaderworker.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    tumblr-downloader.qrc

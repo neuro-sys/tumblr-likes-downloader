@@ -3,6 +3,8 @@
 #include <QProcess>
 #include <iostream>
 #include <QCoreApplication>
+#include <QFile>
+#include <QTemporaryDir>
 
 TumblrDownloaderWorker::TumblrDownloaderWorker(QObject *parent) : QObject(parent)
 {
@@ -17,16 +19,24 @@ TumblrDownloaderWorker::~TumblrDownloaderWorker()
 void TumblrDownloaderWorker::run()
 {
     this->running = true;
-#ifdef Q_WS_MAC
-    process->setWorkingDirectory(QCoreApplication::applicationDirPath() + "/../Resources");
-#else
-    process->setWorkingDirectory(QCoreApplication::applicationDirPath());
-#endif
 #ifdef Q_WS_WIN
-    process->start("./tumblr-downloader.exe");
+    QFile file(":/bin/tumblr-downloader.exe");
 #else
-    process->start("./tumblr-downloader");
+    QFile file(":/bin/tumblr-downloader");
 #endif
+    QFileInfo fileInfo(file.fileName());
+    QTemporaryDir dir;
+
+    QString targetFilePath = dir.path() + QDir::separator() + fileInfo.fileName();
+
+    if (!file.copy(targetFilePath)) {
+        emit emitImageURL("Something went wrong at file: " + QString(__FILE__) + " at func: " + QString(__FUNCTION__));
+    }
+
+    QFile targetFile(targetFilePath);
+    targetFile.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
+
+    process->start(targetFilePath);
     process->waitForReadyRead();
 
     char buf[1024];
