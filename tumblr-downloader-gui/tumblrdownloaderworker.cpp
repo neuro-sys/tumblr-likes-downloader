@@ -19,7 +19,7 @@ TumblrDownloaderWorker::~TumblrDownloaderWorker()
 void TumblrDownloaderWorker::run()
 {
     this->running = true;
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     QFile file(":/bin/tumblr-downloader.exe");
 #else
     QFile file(":/bin/tumblr-downloader");
