@@ -3,5 +3,11 @@ language: go
 go:
   - master
 
-install: make
+install:
+  - go get github.com/dghubble/oauth1
+  - go get github.com/elgs/gojq
+  - go get github.com/headzoo/surf
+
+script:
+  make
 
