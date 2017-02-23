@@ -10,7 +10,7 @@ install:
   - go get github.com/elgs/gojq
   - go get github.com/headzoo/surf
   - sudo apt-get update
-  - sudo apt-get install libqt5-dev qt5-make
+  - sudo apt-get install qtbase5-dev qt5-make qtbase5-dev-tools
 
 script:
   make
