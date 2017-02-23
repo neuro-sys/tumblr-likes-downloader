@@ -1,5 +1,7 @@
 language: go
 
+sudo: required
+
 go:
   - master
 
@@ -7,6 +9,8 @@ install:
   - go get github.com/dghubble/oauth1
   - go get github.com/elgs/gojq
   - go get github.com/headzoo/surf
+  - sudo apt-get update
+  - sudo apt-get install libqt5-dev qt5-make
 
 script:
   make
