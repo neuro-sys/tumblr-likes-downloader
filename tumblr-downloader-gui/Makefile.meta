@@ -1,0 +1,11 @@
+all: qmake build-gui
+
+qmake:
+	qmake
+
+build-gui:
+	$(MAKE)	
+
+clean:
+	$(MAKE) clean || \
+	$(RM) tumblr-downloader-gui
