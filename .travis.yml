@@ -5,19 +5,15 @@ sudo: required
 go:
   - master
 
-addons:
-  apt:
-    sources:
-      - ubuntu-sdk-team
-    packages:
-      - qt5-qmake
-      - qtbase5-dev
-      - qtdeclarative5-dev
-
 install:
   - go get github.com/dghubble/oauth1
   - go get github.com/elgs/gojq
   - go get github.com/headzoo/surf
+  - sudo apt-add-repository -y ppa:ubuntu-toolchain-r/test
+    && sudo apt-add-repository -y ppa:beineri/opt-qt55
+  - sudo apt-get -qq update
+  - sudo apt-get -qq install g++-4.9 qt55base qt55quickcontrols qt55declarative qt55tools qt55svg lcov curl
+
 
 script:
   make
