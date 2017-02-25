@@ -1,12 +1,7 @@
-tumblr-downloader.config
-tumblr-downloader
-build-tumblr-downloader-gui-Desktop-Debug/
-
 # Created by https://www.gitignore.io/api/qt,go
 
 ### Go ###
 # Binaries for programs and plugins
-*.exe
 *.dll
 *.so
 *.dylib
@@ -42,7 +37,6 @@ build-tumblr-downloader-gui-Desktop-Debug/
 moc_*.cpp
 qrc_*.cpp
 ui_*.h
-Makefile*
 *build-*
 
 # QtCreator
@@ -58,4 +52,3 @@ CMakeLists.txt.user*
 
 
 # End of https://www.gitignore.io/api/qt,go
-downloaded_*
