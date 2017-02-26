@@ -40,7 +40,7 @@ script:
   - make
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then macdeployqt tumblr-downloader-gui/tumblr-downloader-gui.app -dmg; tar czvf tumblr-downloader-osx-x64.tar.gz LICENSE COPYING.LESSER tumblr-downloader-gui/tumblr-downloader-gui.dmg; fi
   - if [ "$TRAVIS_OS_NAME" != "linux" ]; then exit 0; fi
-  - qmake PREFIX=/usr
+  # - qmake PREFIX=/usr # Why is this not needed here?
   - make -j4
   - mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir
   - cp ../tumblr-downloader-gui/tumblr-downloader-gui usr/bin/
