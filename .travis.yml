@@ -45,7 +45,6 @@ script:
   - mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir
   - cp ../tumblr-downloader-gui/tumblr-downloader-gui usr/bin/
   - cp ../LICENSE ../COPYING.LESSER 
-  - cp ../tools-linux/tool-esptool/esptool usr/bin
   - cp ../*.desktop .
   - cp ../tumblr-downloader-client.png .
   - cd .. 
