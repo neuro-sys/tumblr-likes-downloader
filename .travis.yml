@@ -47,7 +47,7 @@ script:
   - cp ../LICENSE ../COPYING.LESSER 
   - cp ../tools-linux/tool-esptool/esptool usr/bin
   - cp ../*.desktop .
-  - cp ../tumblr-downloader-gui.png .
+  - cp ../tumblr-downloader-client.png .
   - cd .. 
   - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/3/linuxdeployqt-3-x86_64.AppImage" 
   - chmod a+x linuxdeployqt*.AppImage
