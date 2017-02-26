@@ -42,8 +42,9 @@ script:
   - if [ "$TRAVIS_OS_NAME" != "linux" ]; then exit 0; fi
   # - qmake PREFIX=/usr # Why is this not needed here?
   - make -j4
+  - find .
   - mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir
-  - cp ../tumblr-downloader-gui/tumblr-downloader-gui usr/bin/
+  - cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader usr/bin/
   - cp ../LICENSE ../COPYING.LESSER 
   - cp ../*.desktop .
   - cp ../tumblr-downloader-client.png .
