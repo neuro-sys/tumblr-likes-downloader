@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Tumblr Downloader Client
+Exec=tumblr-downloader-client
+Icon=tumblr-downloader-client
+Categories=AudioVideo;
