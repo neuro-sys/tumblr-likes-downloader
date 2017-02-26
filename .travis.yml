@@ -38,32 +38,28 @@ before_script:
 
 script:
   - make
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then macdeployqt tumblr-downloader-gui/tumblr-downloader-gui.app -dmg; tar czvf tumblr-downloader-osx-x64.tar.gz LICENSE COPYING.LESSER tumblr-downloader-gui/tumblr-downloader-gui.dmg; fi
-  - if [ "$TRAVIS_OS_NAME" != "linux" ]; then exit 0; fi
-  # - qmake PREFIX=/usr # Why is this not needed here?
-  - find .
-  - mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir
-  - cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader usr/bin/
-  - cp ../LICENSE ../COPYING.LESSER 
-  - cp ../*.desktop .
-  - cp ../tumblr-downloader-client.png .
-  - cd .. 
-  - wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/3/linuxdeployqt-3-x86_64.AppImage" 
-  - chmod a+x linuxdeployqt*.AppImage
-  - unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH
-  - ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs
-  - ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage
-  - curl --upload-file ./Tumblr*.AppImage https://transfer.sh/Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then macdeployqt tumblr-downloader-gui/tumblr-downloader-gui.app -dmg; fi;
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.dmg; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader usr/bin/; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cp ../LICENSE ../COPYING.LESSER ; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cp ../*.desktop .; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cp ../tumblr-downloader-client.png .; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then cd .. ; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/3/linuxdeployqt-3-x86_64.AppImage" ; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then chmod a+x linuxdeployqt*.AppImage; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage; fi;
+  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage; fi;
 
 deploy:
   provider: releases
   api_key:
     secure: NaxYh8xD252JErhgtBpHx2Lpka0pqHcdSLTQZa6el/5WwUQswkXRPVyq8csbSL8dMrJLALZTsem1ckd78uEM52Eu38p2/Atu6vjnZ4ECYxRxrek4/OF6cM+Ybk0gB9NXbmOuv6kVS1uUpJKaxrfMXAbouImF/VC3eCUG8NC2oLluUiDCWBxXJgo7IIBeYzLPWafyjcyRFj3TOu4m9MQjCXCX1LQIvXNVBu0UNxUTIGnGUH9J1wVOsYtri6e00QQi2ptjVsReAU2joy9UJ105pcGkX2jA1NbdJvgjCkWOBUJtfdlWHrpLqn2BIcJ+o9E04IbnpxUNj7NJgiilM/eOboHNiLZVmwBnOaKpDHWaD/gCbT6HaVV/9REfijJYh4dYKMyee+avT7YyZNCGNTsF7E71j/CmiSI21Qx7J6kZPo/PHDk1uq1AXWIwnV+1Dtuoy2Z1AgyyMaQdJ686nJYD6DgPxw9fFH3Rw3C+/G9ROpLz/yEZpUO5hniF/UMmlVh2gRSOkRh/TQM3w6CKx1oGNTC9nY7fZHi9I3zQnJhdaE0zwCJkymfvZxkczpSmekHtPgkdHmj+uM2X/lXvKU1muuu/n0juh814JLJtKrWrcdwdrBkHfxhiDgDp6MjWq4X1tawhdcAm2J+qjAJa4Nra7iuN6chBqbJiZ202l1c8vfM=
   file:
-    - tumblr-downloader-${$TRAVIS_OS_NAME}-x64.tar.gz
-    - ./Tumblr*.AppImage # https://github.com/probonopd/AppImageKit/wiki/Creating-AppImages#common-mistake
+    - ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.*
   skip_cleanup: true
+  file_glob: true
   on:
     tags: true
-
