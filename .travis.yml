@@ -55,7 +55,7 @@ script:
   - ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs
   - ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage
   - curl --upload-file ./Tumblr-*.AppImage https://transfer.sh/Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage
-  - mv ./Tumblr-*.AppImage ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage
+  - mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage
 
 deploy:
   provider: releases
@@ -63,7 +63,7 @@ deploy:
     secure: NaxYh8xD252JErhgtBpHx2Lpka0pqHcdSLTQZa6el/5WwUQswkXRPVyq8csbSL8dMrJLALZTsem1ckd78uEM52Eu38p2/Atu6vjnZ4ECYxRxrek4/OF6cM+Ybk0gB9NXbmOuv6kVS1uUpJKaxrfMXAbouImF/VC3eCUG8NC2oLluUiDCWBxXJgo7IIBeYzLPWafyjcyRFj3TOu4m9MQjCXCX1LQIvXNVBu0UNxUTIGnGUH9J1wVOsYtri6e00QQi2ptjVsReAU2joy9UJ105pcGkX2jA1NbdJvgjCkWOBUJtfdlWHrpLqn2BIcJ+o9E04IbnpxUNj7NJgiilM/eOboHNiLZVmwBnOaKpDHWaD/gCbT6HaVV/9REfijJYh4dYKMyee+avT7YyZNCGNTsF7E71j/CmiSI21Qx7J6kZPo/PHDk1uq1AXWIwnV+1Dtuoy2Z1AgyyMaQdJ686nJYD6DgPxw9fFH3Rw3C+/G9ROpLz/yEZpUO5hniF/UMmlVh2gRSOkRh/TQM3w6CKx1oGNTC9nY7fZHi9I3zQnJhdaE0zwCJkymfvZxkczpSmekHtPgkdHmj+uM2X/lXvKU1muuu/n0juh814JLJtKrWrcdwdrBkHfxhiDgDp6MjWq4X1tawhdcAm2J+qjAJa4Nra7iuN6chBqbJiZ202l1c8vfM=
   file:
     - tumblr-downloader-${$TRAVIS_OS_NAME}-x64.tar.gz
-    - ./Tumblr-*.AppImage # https://github.com/probonopd/AppImageKit/wiki/Creating-AppImages#common-mistake
+    - ./Tumblr*.AppImage # https://github.com/probonopd/AppImageKit/wiki/Creating-AppImages#common-mistake
   skip_cleanup: true
   on:
     tags: true
