@@ -29,12 +29,13 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
 	"github.com/headzoo/surf"
 )
+
+const limit = 20
 
 var (
 	username       string
@@ -47,6 +48,8 @@ var (
 	config oauth1.Config
 
 	outputFolderName string
+
+	reURL = regexp.MustCompile("tumblr_[^\\/]+")
 )
 
 func checkError(err error) bool {
@@ -89,6 +92,7 @@ func loadConfig() {
 	callbackURL = getConfigValue("CALLBACK_URL")
 
 	outputFolderName = getConfigValue("TARGET_LOCATION") + string(os.PathSeparator) + blogIdentifier
+	os.Mkdir(outputFolderName, os.ModePerm)
 }
 
 func authTumblr() *http.Client {
@@ -132,7 +136,7 @@ func authTumblr() *http.Client {
 }
 
 func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp int) *gojq.JQ {
-	path := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=20"
+	path := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=" + strconv.Itoa(limit)
 
 	if timestamp != 0 {
 		path += "&before=" + strconv.Itoa(timestamp)
@@ -150,67 +154,110 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 	return parser
 }
 
-func downloadURL(URL string) {
-	resp, err := http.Get(URL)
-	checkError(err)
+func downloadURL(URL string, SubDir string, AppendExtension string) {
+	fmt.Printf("Downloading %s ... ",URL)
 
-	tokens := strings.Split(URL, "/")
-	fileName := tokens[len(tokens)-1]
+	//tokens := strings.Split(URL, "/")
+	//fileName := tokens[len(tokens)-1]
+	fileName := reURL.FindString(URL)
+	if fileName != "" {
 
-	os.Mkdir(outputFolderName, os.ModePerm)
+		outputFilePath := outputFolderName + string(os.PathSeparator) + SubDir + fileName + AppendExtension
+		os.Mkdir(outputFolderName + string(os.PathSeparator) + SubDir, os.ModePerm)
+		//fmt.Println(outputFilePath)
 
-	outputFilePath := outputFolderName + string(os.PathSeparator) + fileName
+		_, err := os.Stat(outputFilePath)
+		if os.IsNotExist(err) {
+			resp, err := http.Get(URL)
+			checkError(err)
 
-	if _, err = os.Stat(outputFilePath); os.IsNotExist(err) {
-		outFile, err := os.Create(outputFilePath)
-		checkError(err)
+			outFile, err := os.Create(outputFilePath)
+			checkError(err)
 
-		defer outFile.Close()
-		_, err = io.Copy(outFile, resp.Body)
+			defer outFile.Close()
+			_, err = io.Copy(outFile, resp.Body)
+			fmt.Println("done")
+		} else {
+			fmt.Println("File already exists, skipping")
+		}
 	} else {
-		fmt.Println("File already exists, skipping.")
+		fmt.Println("No tumblr link, skipping")
 	}
+
 }
 
 func main() {
+	fmt.Printf("Initializing environment... ")
 	loadConfig()
 	initOauthConfig()
+	reVideo, err := regexp.Compile("src=\"([^\"]+)\"")
+	checkError(err)
+	fmt.Println("done")
 
+	fmt.Printf("Authorizing on tumblr... ")
 	httpClient := authTumblr()
 	lastTimestamp := 0
+	fmt.Println("success")
 
 	counter := 1
 	for {
+		fmt.Printf("Ask for liked posts %d - %d... ",counter,counter+limit-1)
 		parser := tumblrGetLikes(httpClient, blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
 		checkError(err)
+		if len(likedPosts) == 0 {
+			fmt.Println("0 rows fetched, always done!")
+			os.Exit(1)
+		} else {
+			fmt.Println("done")
+		}
 
 		for _, v := range likedPosts {
 			postType, err := gojq.NewQuery(v).Query("type")
 			checkError(err)
+			postBlogName, err := gojq.NewQuery(v).Query("blog_name")
+			checkError(err)
+			//fmt.Println(postBlogName)
 
 			lastTimestampString, err := gojq.NewQuery(v).Query("liked_timestamp")
 			checkError(err)
 
 			lastTimestamp = int(lastTimestampString.(float64))
 
-			if postType != "photo" {
-				continue
-			}
-
-			postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
-			checkError(err)
-
-			for _, v2 := range postPhotos {
-				url, err := gojq.NewQuery(v2).Query("original_size.url")
+			if postType == "photo" {
+				postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
 				checkError(err)
 
-				fmt.Println(url)
-				downloadURL(url.(string))
+				for _, v2 := range postPhotos {
+					url, err := gojq.NewQuery(v2).Query("original_size.url")
+					checkError(err)
+
+					switch url.(type) {
+					case string:
+						downloadURL(url.(string),postBlogName.(string)+string(os.PathSeparator),"")
+					}
+				}
 			}
 
+			if postType == "video" {
+				postPlayer, err := gojq.NewQuery(v).QueryToArray("player")
+				checkError(err)
+
+				for _, v2 := range postPlayer {
+					url, err := gojq.NewQuery(v2).Query("embed_code")
+					checkError(err)
+
+					switch url.(type) {
+					case string:
+						urlVideo := reVideo.FindStringSubmatch(url.(string))[1]
+						downloadURL(urlVideo,postBlogName.(string)+string(os.PathSeparator),".mp4")
+					}
+				}
+			}
+			
+			
 			counter += 1
 		}
 	}
-}
+} 
