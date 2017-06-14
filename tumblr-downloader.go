@@ -115,7 +115,7 @@ func authTumblr() *http.Client {
 
 	magicError := form.Click("allow")
 	if magicError == nil {
-		checkError(errors.New("There must have been an error! Do you somehow a webserver running on your computer? Turn it off!"))
+    checkError(errors.New("Try to open http://localhost/, and find a way to shut it down."))
 	}
 
 	re, err := regexp.Compile("oauth_verifier=(.*?)#")
@@ -155,16 +155,12 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 }
 
 func downloadURL(URL string, SubDir string, AppendExtension string) {
-	fmt.Printf("Downloading %s ... ",URL)
-
-	//tokens := strings.Split(URL, "/")
-	//fileName := tokens[len(tokens)-1]
+	fmt.Printf("Downloading %s ... ", URL)
 	fileName := reURL.FindString(URL)
-	if fileName != "" {
 
+	if fileName != "" {
 		outputFilePath := outputFolderName + string(os.PathSeparator) + SubDir + fileName + AppendExtension
 		os.Mkdir(outputFolderName + string(os.PathSeparator) + SubDir, os.ModePerm)
-		//fmt.Println(outputFilePath)
 
 		_, err := os.Stat(outputFilePath)
 		if os.IsNotExist(err) {
@@ -183,7 +179,6 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 	} else {
 		fmt.Println("No tumblr link, skipping")
 	}
-
 }
 
 func main() {
@@ -201,7 +196,7 @@ func main() {
 
 	counter := 1
 	for {
-		fmt.Printf("Ask for liked posts %d - %d... ",counter,counter+limit-1)
+		fmt.Printf("Ask for liked posts %d - %d... ", counter, counter + limit - 1)
 		parser := tumblrGetLikes(httpClient, blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
@@ -218,7 +213,6 @@ func main() {
 			checkError(err)
 			postBlogName, err := gojq.NewQuery(v).Query("blog_name")
 			checkError(err)
-			//fmt.Println(postBlogName)
 
 			lastTimestampString, err := gojq.NewQuery(v).Query("liked_timestamp")
 			checkError(err)
@@ -255,9 +249,9 @@ func main() {
 					}
 				}
 			}
-			
-			
+
 			counter += 1
 		}
 	}
-} 
+}
+
