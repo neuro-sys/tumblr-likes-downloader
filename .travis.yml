@@ -24,9 +24,6 @@ addons:
     - qt5-default
 
 install:
-  - go get github.com/dghubble/oauth1
-  - go get github.com/elgs/gojq
-  - go get github.com/headzoo/surf
   - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
       brew update;
       brew ls | grep -wq qt5 || brew install qt5;

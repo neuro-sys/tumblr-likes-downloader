@@ -53,3 +53,10 @@ CMakeLists.txt.user*
 
 
 # End of https://www.gitignore.io/api/qt,go
+
+tumblr-downloader-gui/.qmake.stash
+tumblr-downloader-gui/Makefile
+tumblr-downloader-gui/moc_predefs.h
+tumblr-downloader-gui/tumblr-downloader
+tumblr-downloader-gui/tumblr-downloader-gui
+
