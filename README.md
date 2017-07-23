@@ -1,5 +1,14 @@
 # tumblr-downloader-client
 
+## Build
+
+Install Go and qt5
+
+```
+make
+./tumblr-downloader-gui/tumblr-downloader-gui
+```
+
 [![Build Status](https://travis-ci.org/neuro-sys/tumblr-downloader-client.svg?branch=master)](https://travis-ci.org/neuro-sys/tumblr-downloader-client)
 
 ## Windows, Linux and Mac OSX builds
