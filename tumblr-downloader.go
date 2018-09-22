@@ -26,13 +26,15 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"net"
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
-	"github.com/headzoo/surf"
+	"github.com/pkg/browser"
 )
 
 const limit = 20
@@ -52,9 +54,14 @@ var (
 	reURL = regexp.MustCompile("tumblr_[^\\/]+")
 )
 
+var lock chan string
+var httpClient *http.Client
+
 func checkError(err error) bool {
 	if err != nil {
+		fmt.Println("There was an error:")
 		fmt.Println(err)
+		time.Sleep(500 * time.Millisecond)
 		os.Exit(1)
 	}
 
@@ -95,47 +102,45 @@ func loadConfig() {
 	os.Mkdir(outputFolderName, os.ModePerm)
 }
 
-func authTumblr() *http.Client {
+func authTumblr() {
 	requestToken, requestSecret, _ := config.RequestToken()
 	authorizationURL, _ := config.AuthorizationURL(requestToken)
 
-	bow := surf.NewBrowser()
-	_ = bow.Open(authorizationURL.String())
+	fmt.Println("Authorization URL: " + authorizationURL.String())
+	fmt.Println("Please check your browser, and log into Tumblr as usual, then come back to this application")
+	browser.OpenURL(authorizationURL.String())
 
-	form, err := bow.Form("#signup_form")
+	listen, err := net.Listen("tcp", ":8080")
 	checkError(err)
 
-	form.Input("user[email]", username)
-	form.Input("user[password]", password)
+	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Check the app!")
+		listen.Close()
+		verifier := r.URL.Query().Get("oauth_verifier")
+		token2 := r.URL.Query().Get("oauth_token")
 
-	form.Submit()
+		fmt.Println(verifier, token2)
 
-	form, err = bow.Form("form")
-	checkError(err)
+		accessToken, accessSecret, err := config.AccessToken(token2, requestSecret, verifier)
+		checkError(err)
 
-	magicError := form.Click("allow")
-	if magicError == nil {
-    checkError(errors.New("Try to open http://localhost/, and find a way to shut it down."))
-	}
+		fmt.Println("FOOOOOO", accessToken, accessSecret)
 
-	re, err := regexp.Compile("oauth_verifier=(.*?)#")
-	checkError(err)
+		token := oauth1.NewToken(accessToken, accessSecret)
 
-	verifierMatch := re.FindAllStringSubmatch(magicError.Error(), -1)
+		ctx := context.Background()
 
-	verifier := verifierMatch[0][1]
+		httpClient = config.Client(ctx, token)
 
-	accessToken, accessSecret, err := config.AccessToken(requestToken, requestSecret, verifier)
-	checkError(err)
+		fmt.Println("Releasing now")
+		time.Sleep(1000 * time.Millisecond)
+		lock <- "Go"
+	})
 
-	token := oauth1.NewToken(accessToken, accessSecret)
-
-	ctx := context.Background()
-
-	return config.Client(ctx, token)
+	http.Serve(listen, nil)
 }
 
-func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp int) *gojq.JQ {
+func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
 	path := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=" + strconv.Itoa(limit)
 
 	if timestamp != 0 {
@@ -155,7 +160,7 @@ func tumblrGetLikes(httpClient *http.Client, blogIdentifier string, timestamp in
 }
 
 func downloadURL(URL string, SubDir string, AppendExtension string) {
-	fmt.Printf("Downloading %s ... ", URL)
+	fmt.Println("Downloading", URL)
 	fileName := reURL.FindString(URL)
 
 	if fileName != "" {
@@ -167,12 +172,12 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 			resp, err := http.Get(URL)
 			checkError(err)
 
+			
 			outFile, err := os.Create(outputFilePath)
 			checkError(err)
 
 			defer outFile.Close()
 			_, err = io.Copy(outFile, resp.Body)
-			fmt.Println("done")
 		} else {
 			fmt.Println("File already exists, skipping")
 		}
@@ -181,28 +186,21 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 	}
 }
 
-func main() {
-	fmt.Printf("Initializing environment... ")
-	loadConfig()
-	initOauthConfig()
+func run() {
 	reVideo, err := regexp.Compile("src=\"([^\"]+)\"")
 	checkError(err)
-	fmt.Println("done")
 
-	fmt.Printf("Authorizing on tumblr... ")
-	httpClient := authTumblr()
 	lastTimestamp := 0
-	fmt.Println("success")
 
 	counter := 1
 	for {
 		fmt.Printf("Ask for liked posts %d - %d... ", counter, counter + limit - 1)
-		parser := tumblrGetLikes(httpClient, blogIdentifier, lastTimestamp)
+		parser := tumblrGetLikes(blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
 		checkError(err)
 		if len(likedPosts) == 0 {
-			fmt.Println("0 rows fetched, always done!")
+			fmt.Println("0 rows fetched")
 			os.Exit(1)
 		} else {
 			fmt.Println("done")
@@ -253,5 +251,27 @@ func main() {
 			counter += 1
 		}
 	}
+}
+
+func main() {
+	fmt.Printf("Initializing environment... ")
+	loadConfig()
+	initOauthConfig()
+	fmt.Println("done")
+
+	lock = make(chan string, 1)
+	fmt.Println("Authorizing on tumblr... ")
+
+	go func() {
+		fmt.Println("Waiting until authorization flow is completed")
+		<-lock
+		fmt.Println("Auth completed")
+		run()
+		fmt.Println("We are done")
+		lock <- "Done"
+	}()
+
+	authTumblr()
+	<-lock
 }
 

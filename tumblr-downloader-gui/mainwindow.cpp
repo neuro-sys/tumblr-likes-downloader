@@ -78,8 +78,6 @@ void MainWindow::loadSettings()
 {
     settings = new QSettings ("Tumblr Downloader", "Tumblr Downloader");
 
-    ui->userNameLineEdit->setText(settings->value("USERNAME").toString());
-    ui->passwordLineEdit->setText(settings->value("PASSWORD").toString());
     ui->blogNameLineEdit->setText(settings->value("BLOG_IDENTIFIER").toString());
     ui->consumerKeyLineEdit->setText(settings->value("CONSUMER_KEY").toString());
     ui->consumerSecretLineEdit->setText(settings->value("CONSUMER_SECRET").toString());
@@ -89,21 +87,17 @@ void MainWindow::loadSettings()
 
 void MainWindow::saveSettings()
 {
-    settings->setValue("USERNAME", ui->userNameLineEdit->text());
-    settings->setValue("PASSWORD", ui->passwordLineEdit->text());
     settings->setValue("BLOG_IDENTIFIER", ui->blogNameLineEdit->text());
     settings->setValue("CONSUMER_KEY", ui->consumerKeyLineEdit->text());
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
-    //settings->setValue("CALLBACK_URL", "http://localhost/tumblr/callback");
+    //settings->setValue("CALLBACK_URL", "http://localhost:8080/tumblr/callback");
     settings->setValue("TARGET_LOCATION", ui->targetLocationLineEdit->text());
     settings->sync();
 
-    qputenv("USERNAME", ui->userNameLineEdit->text().toStdString().c_str());
-    qputenv("PASSWORD", ui->passwordLineEdit->text().toStdString().c_str());
     qputenv("BLOG_IDENTIFIER", ui->blogNameLineEdit->text().toStdString().c_str());
     qputenv("CONSUMER_KEY", ui->consumerKeyLineEdit->text().toStdString().c_str());
     qputenv("CONSUMER_SECRET", ui->consumerSecretLineEdit->text().toStdString().c_str());
-    qputenv("CALLBACK_URL", "http://localhost/tumblr/callback");
+    qputenv("CALLBACK_URL", "http://localhost:8080/tumblr/callback");
     qputenv("TARGET_LOCATION", ui->targetLocationLineEdit->text().toStdString().c_str());
 }
 
