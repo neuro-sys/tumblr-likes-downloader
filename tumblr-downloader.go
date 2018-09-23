@@ -114,7 +114,7 @@ func authTumblr() {
 	listen, err := net.Listen("tcp", ":8080")
 	checkError(err)
 
-	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/tumblr/callback", func (w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Check the app!")
 		verifier := r.URL.Query().Get("oauth_verifier")
 		token2 := r.URL.Query().Get("oauth_token")
