@@ -41,8 +41,7 @@ script:
  macdeployqt tumblr-downloader-gui.app
   -dmg;
  cd ..;
- cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-git.$(git
-  rev-parse --short HEAD)-x86_64.dmg;
+ cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-x86_64.dmg;
  fi
 - if [ "$TRAVIS_OS_NAME" = "linux" ];
  then mkdir -p appdir/usr/bin ;
