@@ -1,5 +1,7 @@
 # tumblr-downloader-client
 
+Lets you download the Tumblr posts that you liked so far to your computer.
+
 ## Build
 
 Install Go and qt5
