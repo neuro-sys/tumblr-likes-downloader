@@ -15,4 +15,4 @@ make
 https://github.com/neuro-sys/tumblr-downloader-client/releases
 
 ## Screenshot
-![Screenshot](http://i.imgur.com/PrvJz3u.png)
+![Screenshot](https://i.imgur.com/jy3J6EV.png)
