@@ -31,6 +31,7 @@ import (
 	"regexp"
 	"strconv"
 	"time"
+	"strings"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
@@ -40,8 +41,7 @@ import (
 const limit = 20
 
 var (
-	username       string
-	password       string
+
 	blogIdentifier string
 	consumerKey    string
 	consumerSecret string
@@ -91,12 +91,13 @@ func getConfigValue(key string) string {
 }
 
 func loadConfig() {
-	username = getConfigValue("USERNAME")
-	password = getConfigValue("PASSWORD")
 	blogIdentifier = getConfigValue("BLOG_IDENTIFIER")
 	consumerKey = getConfigValue("CONSUMER_KEY")
 	consumerSecret = getConfigValue("CONSUMER_SECRET")
 	callbackURL = getConfigValue("CALLBACK_URL")
+
+	blogIdentifier = strings.Replace(blogIdentifier, "http://", "", -1)
+	blogIdentifier = strings.Replace(blogIdentifier, "https://", "", -1)
 
 	outputFolderName = getConfigValue("TARGET_LOCATION") + string(os.PathSeparator) + blogIdentifier
 	os.Mkdir(outputFolderName, os.ModePerm)
