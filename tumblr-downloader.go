@@ -22,7 +22,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"golang.org/x/net/context"
+	"context"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -115,16 +115,15 @@ func authTumblr() {
 
 	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "Check the app!")
-		listen.Close()
 		verifier := r.URL.Query().Get("oauth_verifier")
 		token2 := r.URL.Query().Get("oauth_token")
 
 		fmt.Println(verifier, token2)
 
+		listen.Close()
+
 		accessToken, accessSecret, err := config.AccessToken(token2, requestSecret, verifier)
 		checkError(err)
-
-		fmt.Println("FOOOOOO", accessToken, accessSecret)
 
 		token := oauth1.NewToken(accessToken, accessSecret)
 
