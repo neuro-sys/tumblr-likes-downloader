@@ -1,72 +1,45 @@
 language: go
-
 dist: trusty
-
 sudo: true
-
 go:
-  - master
-
+- master
 os:
-  - linux
-  - osx
-
+- linux
+- osx
 compiler:
-  - gcc
-  - clang
-
+- gcc
+- clang
 before_install:
-- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:beineri/opt-qt58-trusty; fi
-
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo add-apt-repository -y ppa:beineri/opt-qt58-trusty;
+  fi
 addons:
   apt:
     packages:
     - qt5-default
-
 install:
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      brew update;
-      brew ls | grep -wq qt5 || brew install qt5;
-      export PATH=$PATH:/usr/local/opt/qt5/bin;
-    fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      sudo apt-get -qq update;
-      sudo apt-get -qq install qt58base qt58tools qt58svg;
-    fi
-
+- if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew update; brew ls | grep -wq qt5 || brew
+  install qt5; export PATH=$PATH:/usr/local/opt/qt5/bin; fi
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then sudo apt-get -qq update; sudo apt-get -qq
+  install qt58base qt58tools qt58svg; fi
 before_script:
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then source /opt/qt58/bin/qt58-env.sh; fi
-
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then source /opt/qt58/bin/qt58-env.sh; fi
 script:
-  - make
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
-      cd tumblr-downloader-gui;
-      macdeployqt tumblr-downloader-gui.app -dmg;
-      cd ..;
-      cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.dmg;
-    fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ]; then
-      mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons} ; cd appdir;
-      cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader usr/bin/;
-      cp ../LICENSE ../COPYING.LESSER ;
-      cp ../*.desktop .;
-      cp ../tumblr-downloader-client.png .;
-      cd .. ;
-      wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage" ;
-      chmod a+x linuxdeployqt*.AppImage;
-      unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH;
-      ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs;
-      ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage;
-      mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage;
-    fi
-
+- make
+- if [ "$TRAVIS_OS_NAME" = "osx" ]; then cd tumblr-downloader-gui; macdeployqt tumblr-downloader-gui.app
+  -dmg; cd ..; cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-git.$(git
+  rev-parse --short HEAD)-x86_64.dmg; fi
+- if [ "$TRAVIS_OS_NAME" = "linux" ]; then mkdir -p appdir/usr/bin ; mkdir -p appdir/usr/share/{applications,icons}
+  ; cd appdir; cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader
+  usr/bin/; cp ../LICENSE ../COPYING.LESSER ; cp ../*.desktop .; cp ../tumblr-downloader-client.png
+  .; cd .. ; wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+  ; chmod a+x linuxdeployqt*.AppImage; unset QTDIR; unset QT_PLUGIN_PATH ; unset LD_LIBRARY_PATH;
+  ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs;
+  ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage; mv ./Tumblr*.AppImage
+  ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.AppImage; fi
 deploy:
   provider: releases
   api_key:
-    secure: NaxYh8xD252JErhgtBpHx2Lpka0pqHcdSLTQZa6el/5WwUQswkXRPVyq8csbSL8dMrJLALZTsem1ckd78uEM52Eu38p2/Atu6vjnZ4ECYxRxrek4/OF6cM+Ybk0gB9NXbmOuv6kVS1uUpJKaxrfMXAbouImF/VC3eCUG8NC2oLluUiDCWBxXJgo7IIBeYzLPWafyjcyRFj3TOu4m9MQjCXCX1LQIvXNVBu0UNxUTIGnGUH9J1wVOsYtri6e00QQi2ptjVsReAU2joy9UJ105pcGkX2jA1NbdJvgjCkWOBUJtfdlWHrpLqn2BIcJ+o9E04IbnpxUNj7NJgiilM/eOboHNiLZVmwBnOaKpDHWaD/gCbT6HaVV/9REfijJYh4dYKMyee+avT7YyZNCGNTsF7E71j/CmiSI21Qx7J6kZPo/PHDk1uq1AXWIwnV+1Dtuoy2Z1AgyyMaQdJ686nJYD6DgPxw9fFH3Rw3C+/G9ROpLz/yEZpUO5hniF/UMmlVh2gRSOkRh/TQM3w6CKx1oGNTC9nY7fZHi9I3zQnJhdaE0zwCJkymfvZxkczpSmekHtPgkdHmj+uM2X/lXvKU1muuu/n0juh814JLJtKrWrcdwdrBkHfxhiDgDp6MjWq4X1tawhdcAm2J+qjAJa4Nra7iuN6chBqbJiZ202l1c8vfM=
-  file:
-    - ./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.*
-  skip_cleanup: true
-  file_glob: true
+    secure: ev2xc7PMIHUgojX53xISaZ6RJD4uFYQ/qYVhQraCkNEEPlVRTU+paT+6i7Cyo/GB9oKzENfcTmg/+NeEp03FtpgPpLJuPph60hrndxDq2vvIc0qd/TAoCdvD+LKoDl/rbocTjvPzw2LWK/Gd48Q4kOnWaPANOh9NjWL25eo8BejEfdw/lZ9heVsRcKmDPA5AxR9bPHVtwbgra/lN8QnwyRg2diq/fyPwCrjOELuEjNIT9Jc0j3aD357cLTan4FpfuaytsA2lvijXUGjXe22tKMJjFwbFQIPFJm1yPSk4D5FKM/2HsExNGrQK5FtqJb2iRCiHH63/QseVdHQRuIsbZGhA5QDKrQ/PRKKH0c6LDjgcn0GdIVdPriOcDcruFP4TaX2GcGl+rtrRb/mDKRr07aVu4ip9Pmn+pe+76xSxSEokzZmg7IxfeGwL/ilTcFPw+GenjiYHsb0Rb51zQmxBNKrUKJzId7xwdUcGyri/suGaD+iznh72CAKDKGI54Y0AJIuaX0VrjS2wJ004bwPWwNOARQfuDzMljNCDEUW1N9Fwre8VtbRf/FE7Zkuojv+9acusQn8V4g/13Twem5aPzWs+532lCippn9GTYxuou8QZlsXxfZGrCoGzA4AYH1UM5QXn1ydLFQXMCIChnLmlJHkNGv8ovFpbTKMmvgvTuTI=
+  file: "./Tumblr_Downloader_GUI-git.$(git rev-parse --short HEAD)-x86_64.*"
   on:
-    tags: true
+    repo: neuro-sys/tumblr-downloader-client
