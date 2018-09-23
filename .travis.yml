@@ -73,5 +73,7 @@ deploy:
   api_key:
     secure: ev2xc7PMIHUgojX53xISaZ6RJD4uFYQ/qYVhQraCkNEEPlVRTU+paT+6i7Cyo/GB9oKzENfcTmg/+NeEp03FtpgPpLJuPph60hrndxDq2vvIc0qd/TAoCdvD+LKoDl/rbocTjvPzw2LWK/Gd48Q4kOnWaPANOh9NjWL25eo8BejEfdw/lZ9heVsRcKmDPA5AxR9bPHVtwbgra/lN8QnwyRg2diq/fyPwCrjOELuEjNIT9Jc0j3aD357cLTan4FpfuaytsA2lvijXUGjXe22tKMJjFwbFQIPFJm1yPSk4D5FKM/2HsExNGrQK5FtqJb2iRCiHH63/QseVdHQRuIsbZGhA5QDKrQ/PRKKH0c6LDjgcn0GdIVdPriOcDcruFP4TaX2GcGl+rtrRb/mDKRr07aVu4ip9Pmn+pe+76xSxSEokzZmg7IxfeGwL/ilTcFPw+GenjiYHsb0Rb51zQmxBNKrUKJzId7xwdUcGyri/suGaD+iznh72CAKDKGI54Y0AJIuaX0VrjS2wJ004bwPWwNOARQfuDzMljNCDEUW1N9Fwre8VtbRf/FE7Zkuojv+9acusQn8V4g/13Twem5aPzWs+532lCippn9GTYxuou8QZlsXxfZGrCoGzA4AYH1UM5QXn1ydLFQXMCIChnLmlJHkNGv8ovFpbTKMmvgvTuTI=
   file: "./Tumblr_Downloader_GUI-x86_64.AppImage"
+  skip_cleanup: true
+  file_glob: true
   on:
     repo: neuro-sys/tumblr-downloader-client
