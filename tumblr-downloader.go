@@ -170,8 +170,6 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 		_, err := os.Stat(outputFilePath)
 		if os.IsNotExist(err) {
 			resp, err := http.Get(URL)
-			checkError(err)
-
 			
 			outFile, err := os.Create(outputFilePath)
 			checkError(err)
