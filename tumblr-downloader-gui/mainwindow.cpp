@@ -47,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     loadSettings();
 
+    QFont statusFont("Courier New");
+    statusFont.setStyleHint(QFont::Monospace);
+    ui->statusTextArea->setFont(statusFont);
+
     ui->targetLocationLineEdit->installEventFilter(this);
     if (ui->targetLocationLineEdit->text().isEmpty()) {
         ui->targetLocationLineEdit->setText(QCoreApplication::applicationDirPath());
@@ -63,7 +67,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if (this->thread->isRunning()) {
         tumblrDownloaderWorker->running = false;
         ui->pushButton->setText("Cancelling...");
-        ui->statusTextArea->appendPlainText("* Cancelling...");
+        ui->statusTextArea->append("* Cancelling...");
         this->thread->quit();
         qApp->processEvents();
         this->thread->wait();
@@ -83,6 +87,8 @@ void MainWindow::loadSettings()
     ui->consumerSecretLineEdit->setText(settings->value("CONSUMER_SECRET").toString());
     //ui->defaultCallbackURLLineEdit->setText(settings->value("CALLBACK_URL").toString());
     ui->targetLocationLineEdit->setText(settings->value("TARGET_LOCATION").toString());
+    ui->startOffsetLineEdit->setText(settings->value("START_OFFSET").toString());
+    ui->debugModeCheckBox->setChecked(settings->value("DEBUG_MODE").toBool());
 }
 
 void MainWindow::saveSettings()
@@ -92,6 +98,8 @@ void MainWindow::saveSettings()
     settings->setValue("CONSUMER_SECRET", ui->consumerSecretLineEdit->text());
     //settings->setValue("CALLBACK_URL", "http://localhost:8080/tumblr/callback");
     settings->setValue("TARGET_LOCATION", ui->targetLocationLineEdit->text());
+    settings->setValue("START_OFFSET", ui->startOffsetLineEdit->text());
+    settings->setValue("DEBUG_MODE", ui->debugModeCheckBox->isChecked());
     settings->sync();
 
     qputenv("BLOG_IDENTIFIER", ui->blogNameLineEdit->text().toStdString().c_str());
@@ -99,6 +107,8 @@ void MainWindow::saveSettings()
     qputenv("CONSUMER_SECRET", ui->consumerSecretLineEdit->text().toStdString().c_str());
     qputenv("CALLBACK_URL", "http://localhost:8080/tumblr/callback");
     qputenv("TARGET_LOCATION", ui->targetLocationLineEdit->text().toStdString().c_str());
+    qputenv("START_OFFSET", ui->startOffsetLineEdit->text().toStdString().c_str());
+    qputenv("DEBUG_MODE", ui->debugModeCheckBox->isChecked() ? "true" : "false");
 }
 
 void MainWindow::on_pushButton_clicked()
@@ -106,27 +116,30 @@ void MainWindow::on_pushButton_clicked()
     if (this->thread->isRunning()) {
         tumblrDownloaderWorker->running = false;
         ui->pushButton->setText("Cancelling...");
-        ui->statusTextArea->appendPlainText("* Cancelling...");
+        ui->statusTextArea->append("* Cancelling...");
         this->thread->quit();
         qApp->processEvents();
         this->thread->wait();
+        this->thread->exit(0);
         ui->pushButton->setText("Download");
     } else {
         saveSettings();
         thread->start();
         ui->pushButton->setText("Cancel");
-        ui->statusTextArea->appendPlainText("* Starting...");
+        ui->statusTextArea->clear();
+        ui->statusTextArea->append("* Starting...\n");
     }
 }
 
 void MainWindow::receiveTumblrImageURL(const QString &imgURL)
 {
-    ui->statusTextArea->appendPlainText(imgURL);
+    ui->statusTextArea->insertPlainText(imgURL);
+    ui->statusTextArea->ensureCursorVisible();
 }
 
 void MainWindow::receiveTumblrImageURLFinished()
 {
-    ui->statusTextArea->appendPlainText("* Finished...");
+    ui->statusTextArea->append("* Finished...");
     ui->pushButton->setText("Download");
     this->tumblrDownloaderWorker->running = false;
     this->thread->quit();

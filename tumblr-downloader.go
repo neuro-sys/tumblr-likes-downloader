@@ -20,28 +20,28 @@
 package main
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"context"
 	"io"
 	"io/ioutil"
-	"net/http"
 	"net"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
-	"time"
 	"strings"
+	"time"
 
 	"github.com/dghubble/oauth1"
 	"github.com/elgs/gojq"
 	"github.com/pkg/browser"
 )
 
-const limit = 20
+const limit = 5
 
 var (
-
 	blogIdentifier string
 	consumerKey    string
 	consumerSecret string
@@ -50,6 +50,8 @@ var (
 	config oauth1.Config
 
 	outputFolderName string
+	startOffset      string
+	debug            bool
 
 	reURL = regexp.MustCompile("tumblr_[^\\/]+")
 )
@@ -101,6 +103,9 @@ func loadConfig() {
 
 	outputFolderName = getConfigValue("TARGET_LOCATION") + string(os.PathSeparator) + blogIdentifier
 	os.Mkdir(outputFolderName, os.ModePerm)
+
+	startOffset = getConfigValue("START_OFFSET")
+	debug, _ = strconv.ParseBool(getConfigValue("DEBUG_MODE"))
 }
 
 func authTumblr() {
@@ -108,14 +113,15 @@ func authTumblr() {
 	authorizationURL, _ := config.AuthorizationURL(requestToken)
 
 	fmt.Println("Authorization URL: " + authorizationURL.String())
-	fmt.Println("Please check your browser, and log into Tumblr as usual, then come back to this application")
+	fmt.Println("Please check your browser, and log into Tumblr as usual, then come back to this application.")
+
 	browser.OpenURL(authorizationURL.String())
 
 	listen, err := net.Listen("tcp", ":8080")
 	checkError(err)
 
-	http.HandleFunc("/tumblr/callback", func (w http.ResponseWriter, r *http.Request) {
-		fmt.Fprint(w, "Check the app!")
+	http.HandleFunc("/tumblr/callback", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, "Success! Now go check the app!")
 		verifier := r.URL.Query().Get("oauth_verifier")
 		token2 := r.URL.Query().Get("oauth_token")
 
@@ -143,8 +149,16 @@ func authTumblr() {
 func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
 	path := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=" + strconv.Itoa(limit)
 
+	if timestamp == 0 {
+		path += "&offset=" + startOffset
+	}
+
 	if timestamp != 0 {
 		path += "&before=" + strconv.Itoa(timestamp)
+	}
+
+	if debug {
+		fmt.Println("[DEBUG] - " + path)
 	}
 
 	resp, err := httpClient.Get(path)
@@ -156,6 +170,12 @@ func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
 	parser, err := gojq.NewStringQuery(string(body))
 	checkError(err)
 
+	if debug {
+		mapRes, _ := parser.QueryToMap(".")
+		res, _ := json.MarshalIndent(mapRes, "", "  ")
+		fmt.Println("[DEBUG] - " + string(res))
+	}
+
 	return parser
 }
 
@@ -165,12 +185,12 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 
 	if fileName != "" {
 		outputFilePath := outputFolderName + string(os.PathSeparator) + SubDir + fileName + AppendExtension
-		os.Mkdir(outputFolderName + string(os.PathSeparator) + SubDir, os.ModePerm)
+		os.Mkdir(outputFolderName+string(os.PathSeparator)+SubDir, os.ModePerm)
 
 		_, err := os.Stat(outputFilePath)
 		if os.IsNotExist(err) {
 			resp, err := http.Get(URL)
-			
+
 			outFile, err := os.Create(outputFilePath)
 			checkError(err)
 
@@ -191,8 +211,10 @@ func run() {
 	lastTimestamp := 0
 
 	counter := 1
+	counterStartOffset, _ := strconv.ParseInt(startOffset, 10, 32)
+	counter = counter + int(counterStartOffset)
 	for {
-		fmt.Printf("Ask for liked posts %d - %d... ", counter, counter + limit - 1)
+		fmt.Printf("Ask for liked posts %d - %d... ", counter, counter+limit-1)
 		parser := tumblrGetLikes(blogIdentifier, lastTimestamp)
 
 		likedPosts, err := parser.QueryToArray("response.liked_posts")
@@ -225,7 +247,7 @@ func run() {
 
 					switch url.(type) {
 					case string:
-						downloadURL(url.(string),postBlogName.(string)+string(os.PathSeparator),"")
+						downloadURL(url.(string), postBlogName.(string)+string(os.PathSeparator), "")
 					}
 				}
 			}
@@ -241,7 +263,7 @@ func run() {
 					switch url.(type) {
 					case string:
 						urlVideo := reVideo.FindStringSubmatch(url.(string))[1]
-						downloadURL(urlVideo,postBlogName.(string)+string(os.PathSeparator),".mp4")
+						downloadURL(urlVideo, postBlogName.(string)+string(os.PathSeparator), ".mp4")
 					}
 				}
 			}
@@ -252,10 +274,9 @@ func run() {
 }
 
 func main() {
-	fmt.Printf("Initializing environment... ")
+	fmt.Println("Initializing environment... ")
 	loadConfig()
 	initOauthConfig()
-	fmt.Println("done")
 
 	lock = make(chan string, 1)
 	fmt.Println("Authorizing on tumblr... ")
@@ -263,13 +284,11 @@ func main() {
 	go func() {
 		fmt.Println("Waiting until authorization flow is completed")
 		<-lock
-		fmt.Println("Auth completed")
+		fmt.Println("Authorization complete")
 		run()
-		fmt.Println("We are done")
 		lock <- "Done"
 	}()
 
 	authTumblr()
 	<-lock
 }
-
