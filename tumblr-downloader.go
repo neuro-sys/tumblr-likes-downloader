@@ -248,12 +248,13 @@ func run() {
 				postPhotos, err := gojq.NewQuery(v).QueryToArray("photos")
 				checkError(err)
 
-				for _, v2 := range postPhotos {
+				for i, v2 := range postPhotos {
 					url, err := gojq.NewQuery(v2).Query("original_size.url")
 					checkError(err)
 
 					switch url.(type) {
 					case string:
+						fmt.Print("[" + strconv.Itoa(counter) + "/" + strconv.Itoa(i) + "] ")
 						downloadURL(url.(string), postBlogName.(string)+string(os.PathSeparator))
 					}
 				}
@@ -261,11 +262,13 @@ func run() {
 
 			if postType == "video" {
 				videoUrl, err := gojq.NewQuery(v).Query("video_url")
-				checkError(err)
 
-				switch videoUrl.(type) {
-				case string:
-					downloadURL(videoUrl.(string), postBlogName.(string)+string(os.PathSeparator))
+				if err == nil && videoUrl != nil {
+					switch videoUrl.(type) {
+					case string:
+						fmt.Print("[" + strconv.Itoa(counter) + "] ")
+						downloadURL(videoUrl.(string), postBlogName.(string)+string(os.PathSeparator))
+					}
 				}
 			}
 

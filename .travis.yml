@@ -44,27 +44,24 @@ script:
  cp tumblr-downloader-gui/tumblr-downloader-gui.dmg ./Tumblr_Downloader_GUI-x86_64.dmg;
  fi
 - if [ "$TRAVIS_OS_NAME" = "linux" ];
- then mkdir -p appdir/usr/bin ;
- mkdir -p appdir/usr/share/{applications,icons}
-  ;
- cd appdir;
- cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader
-  usr/bin/;
- cp ../LICENSE ../COPYING.LESSER ;
- cp ../*.desktop .;
- cp ../tumblr-downloader-client.png
-  .;
- cd .. ;
- wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage"
-  ;
- chmod a+x linuxdeployqt*.AppImage;
- unset QTDIR;
- unset QT_PLUGIN_PATH ;
- unset LD_LIBRARY_PATH;
- ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs;
- ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage;
- mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-x86_64.AppImage;
- chmod a+x ./Tumblr_Downloader_GUI-x86_64.AppImage;
+   then mkdir -p appdir/usr/bin ;
+   mkdir -p appdir/usr/share/{applications,icons} ;
+   cd appdir;
+   cp ../tumblr-downloader-gui/tumblr-downloader-gui ../tumblr-downloader-gui/tumblr-downloader usr/bin/;
+   chmod a+x usr/bin/* ;
+   cp ../LICENSE ../COPYING.LESSER ;
+   cp ../*.desktop .;
+   cp ../tumblr-downloader-client.png .;
+   cd .. ;
+   wget -c "https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage" ;
+   chmod a+x linuxdeployqt*.AppImage;
+   unset QTDIR;
+   unset QT_PLUGIN_PATH ;
+   unset LD_LIBRARY_PATH;
+   ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -bundle-non-qt-libs;
+   ./linuxdeployqt*.AppImage ./appdir/usr/bin/tumblr-downloader-gui -appimage;
+   mv ./Tumblr*.AppImage ./Tumblr_Downloader_GUI-x86_64.AppImage;
+   chmod a+x ./Tumblr_Downloader_GUI-x86_64.AppImage;
  fi
 deploy:
   provider: releases

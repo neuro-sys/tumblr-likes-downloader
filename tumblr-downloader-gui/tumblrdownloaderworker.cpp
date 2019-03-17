@@ -58,7 +58,9 @@ void TumblrDownloaderWorker::run()
     targetFile.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
 
     process->start(targetFilePath);
-    process->waitForReadyRead();
+    if (!process->waitForReadyRead()) {
+        emit emitImageURL("The process did not start successfully.");
+    }
 
     char buf[1024];
     buf[0] = 0;
