@@ -160,7 +160,11 @@
            </widget>
           </item>
           <item row="4" column="1">
-           <widget class="QLineEdit" name="startOffsetLineEdit"/>
+           <widget class="QLineEdit" name="startOffsetLineEdit">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="debugModeLabel">

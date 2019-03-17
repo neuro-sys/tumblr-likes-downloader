@@ -90,6 +90,10 @@ void MainWindow::loadSettings()
     ui->startOffsetLineEdit->setText(settings->value("START_OFFSET").toString());
     ui->debugModeCheckBox->setChecked(settings->value("DEBUG_MODE").toBool());
     ui->downloadToSameDirectoryCheckBox->setChecked(settings->value("DOWNLOAD_NO_DIRS").toBool());
+
+    if (ui->startOffsetLineEdit->text().length() == 0) {
+        ui->startOffsetLineEdit->setText("0");
+    }
 }
 
 void MainWindow::saveSettings()
