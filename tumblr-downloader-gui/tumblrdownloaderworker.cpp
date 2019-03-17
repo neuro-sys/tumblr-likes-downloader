@@ -60,6 +60,7 @@ void TumblrDownloaderWorker::run()
     process->start(targetFilePath);
     if (!process->waitForReadyRead()) {
         emit emitImageURL("The process did not start successfully.");
+        emit emitImageURL("Error: " + process->errorString());
     }
 
     char buf[1024];
