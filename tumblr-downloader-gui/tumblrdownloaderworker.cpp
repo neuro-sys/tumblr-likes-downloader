@@ -65,10 +65,10 @@ void TumblrDownloaderWorker::run()
     do {
         process->readLine(buf, sizeof(buf));
         if (strlen(buf) > 0) {
-            emit emitImageURL(QString::fromLocal8Bit(buf).simplified());
+            emit emitImageURL(QString::fromLocal8Bit(buf));
         }
         buf[0] = 0;
-    } while (!process->waitForFinished(100) && running);
+    } while (!process->waitForFinished(1) && running);
 
     process->kill();
     emit receiveTumblrImageURLFinished();
