@@ -44,7 +44,7 @@
          </size>
         </property>
         <property name="text">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr Downloader&lt;/span&gt; is an application that authenticates to your tumblr account, and downloads all the liked pictures to your computer.&lt;/p&gt;&lt;p&gt;In order to do this you need to register an application on the official tumblr website using the following link: &lt;a href=&quot;https://www.tumblr.com/oauth/apps&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/oauth/apps&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You should set the following fields as follows:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Application Website&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost:8080/tumblr&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Default Callback URL&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost:8080/tumblr/callback&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Once you have done that, fill the configuration parameters accordingly below. Detailed information regarding &lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr API&lt;/span&gt; is found here: &lt;a href=&quot;https://www.tumblr.com/docs/en/api/v2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/docs/en/api/v2&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr Downloader&lt;/span&gt; is an application that authenticates to your tumblr account, and downloads all the posts you liked from others to your computer.&lt;/p&gt;&lt;p&gt;In order to do this you need to register an application on the official tumblr website using the following link: &lt;a href=&quot;https://www.tumblr.com/oauth/apps&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/oauth/apps&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;p&gt;You should set the following fields as follows:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Application Website&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost:8080/tumblr&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Default Callback URL&lt;/span&gt;: &lt;span style=&quot; font-style:italic;&quot;&gt;http://localhost:8080/tumblr/callback&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Once you have done that, fill the configuration parameters accordingly below. Detailed information regarding &lt;span style=&quot; font-weight:600;&quot;&gt;Tumblr API&lt;/span&gt; is found here: &lt;a href=&quot;https://www.tumblr.com/docs/en/api/v2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#2980b9;&quot;&gt;https://www.tumblr.com/docs/en/api/v2&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
@@ -102,7 +102,7 @@
              <string/>
             </property>
             <property name="text">
-             <string>Blog Name</string>
+             <string>User Name</string>
             </property>
            </widget>
           </item>
@@ -111,11 +111,14 @@
             <property name="toolTip">
              <string>This is your tumblr blog's domain name.</string>
             </property>
+            <property name="text">
+             <string/>
+            </property>
             <property name="echoMode">
              <enum>QLineEdit::Normal</enum>
             </property>
             <property name="placeholderText">
-             <string>my-user-name.tumblr.com</string>
+             <string>my-user-name</string>
             </property>
            </widget>
           </item>
@@ -149,16 +152,6 @@
           <item row="3" column="1">
            <widget class="QLineEdit" name="targetLocationLineEdit"/>
           </item>
-          <item row="6" column="1">
-           <widget class="QPushButton" name="pushButton">
-            <property name="text">
-             <string>Download</string>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="1">
-           <widget class="QLineEdit" name="startOffsetLineEdit"/>
-          </item>
           <item row="4" column="0">
            <widget class="QLabel" name="startOffsetLabel">
             <property name="text">
@@ -166,13 +159,33 @@
             </property>
            </widget>
           </item>
-          <item row="5" column="1">
-           <widget class="QCheckBox" name="debugModeCheckBox"/>
+          <item row="4" column="1">
+           <widget class="QLineEdit" name="startOffsetLineEdit"/>
           </item>
           <item row="5" column="0">
            <widget class="QLabel" name="debugModeLabel">
             <property name="text">
              <string>Debug Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QCheckBox" name="debugModeCheckBox"/>
+          </item>
+          <item row="7" column="1">
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>Download</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QCheckBox" name="downloadToSameDirectoryCheckBox"/>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="downloadToSameDirectoryLabel">
+            <property name="text">
+             <string>Download To Same Directory</string>
             </property>
            </widget>
           </item>
