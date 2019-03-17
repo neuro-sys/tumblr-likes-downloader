@@ -39,7 +39,7 @@ import (
 	"github.com/pkg/browser"
 )
 
-const limit = 5
+const limit = 50
 
 var (
 	blogIdentifier string
@@ -52,6 +52,7 @@ var (
 	outputFolderName string
 	startOffset      string
 	debug            bool
+	downloadNoDirs   bool
 
 	reURL = regexp.MustCompile("tumblr_[^\\/]+")
 )
@@ -100,12 +101,15 @@ func loadConfig() {
 
 	blogIdentifier = strings.Replace(blogIdentifier, "http://", "", -1)
 	blogIdentifier = strings.Replace(blogIdentifier, "https://", "", -1)
+	blogIdentifier = strings.Replace(blogIdentifier, ".tumblr.com", "", -1)
+	blogIdentifier = blogIdentifier + ".tumblr.com"
 
 	outputFolderName = getConfigValue("TARGET_LOCATION") + string(os.PathSeparator) + blogIdentifier
 	os.Mkdir(outputFolderName, os.ModePerm)
 
 	startOffset = getConfigValue("START_OFFSET")
 	debug, _ = strconv.ParseBool(getConfigValue("DEBUG_MODE"))
+	downloadNoDirs, _ = strconv.ParseBool(getConfigValue("DOWNLOAD_NO_DIRS"))
 }
 
 func authTumblr() {
@@ -179,13 +183,19 @@ func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
 	return parser
 }
 
-func downloadURL(URL string, SubDir string, AppendExtension string) {
+func downloadURL(URL string, SubDir string) {
 	fmt.Println("Downloading", URL)
 	fileName := reURL.FindString(URL)
 
 	if fileName != "" {
-		outputFilePath := outputFolderName + string(os.PathSeparator) + SubDir + fileName + AppendExtension
-		os.Mkdir(outputFolderName+string(os.PathSeparator)+SubDir, os.ModePerm)
+		var outputFilePath string
+
+		if downloadNoDirs {
+			outputFilePath = outputFolderName + string(os.PathSeparator) + fileName
+		} else {
+			outputFilePath = outputFolderName + string(os.PathSeparator) + SubDir + fileName
+			os.Mkdir(outputFolderName + string(os.PathSeparator)+SubDir, os.ModePerm)
+		}
 
 		_, err := os.Stat(outputFilePath)
 		if os.IsNotExist(err) {
@@ -205,9 +215,6 @@ func downloadURL(URL string, SubDir string, AppendExtension string) {
 }
 
 func run() {
-	reVideo, err := regexp.Compile("src=\"([^\"]+)\"")
-	checkError(err)
-
 	lastTimestamp := 0
 
 	counter := 1
@@ -247,24 +254,18 @@ func run() {
 
 					switch url.(type) {
 					case string:
-						downloadURL(url.(string), postBlogName.(string)+string(os.PathSeparator), "")
+						downloadURL(url.(string), postBlogName.(string)+string(os.PathSeparator))
 					}
 				}
 			}
 
 			if postType == "video" {
-				postPlayer, err := gojq.NewQuery(v).QueryToArray("player")
+				videoUrl, err := gojq.NewQuery(v).Query("video_url")
 				checkError(err)
 
-				for _, v2 := range postPlayer {
-					url, err := gojq.NewQuery(v2).Query("embed_code")
-					checkError(err)
-
-					switch url.(type) {
-					case string:
-						urlVideo := reVideo.FindStringSubmatch(url.(string))[1]
-						downloadURL(urlVideo, postBlogName.(string)+string(os.PathSeparator), ".mp4")
-					}
+				switch videoUrl.(type) {
+				case string:
+					downloadURL(videoUrl.(string), postBlogName.(string)+string(os.PathSeparator))
 				}
 			}
 

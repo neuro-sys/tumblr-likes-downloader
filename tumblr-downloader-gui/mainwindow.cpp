@@ -89,6 +89,7 @@ void MainWindow::loadSettings()
     ui->targetLocationLineEdit->setText(settings->value("TARGET_LOCATION").toString());
     ui->startOffsetLineEdit->setText(settings->value("START_OFFSET").toString());
     ui->debugModeCheckBox->setChecked(settings->value("DEBUG_MODE").toBool());
+    ui->downloadToSameDirectoryCheckBox->setChecked(settings->value("DOWNLOAD_NO_DIRS").toBool());
 }
 
 void MainWindow::saveSettings()
@@ -100,6 +101,7 @@ void MainWindow::saveSettings()
     settings->setValue("TARGET_LOCATION", ui->targetLocationLineEdit->text());
     settings->setValue("START_OFFSET", ui->startOffsetLineEdit->text());
     settings->setValue("DEBUG_MODE", ui->debugModeCheckBox->isChecked());
+    settings->setValue("DOWNLOAD_NO_DIRS", ui->downloadToSameDirectoryCheckBox->isChecked());
     settings->sync();
 
     qputenv("BLOG_IDENTIFIER", ui->blogNameLineEdit->text().toStdString().c_str());
@@ -109,6 +111,7 @@ void MainWindow::saveSettings()
     qputenv("TARGET_LOCATION", ui->targetLocationLineEdit->text().toStdString().c_str());
     qputenv("START_OFFSET", ui->startOffsetLineEdit->text().toStdString().c_str());
     qputenv("DEBUG_MODE", ui->debugModeCheckBox->isChecked() ? "true" : "false");
+    qputenv("DOWNLOAD_NO_DIRS", ui->downloadToSameDirectoryCheckBox->isChecked() ? "true" : "false");
 }
 
 void MainWindow::on_pushButton_clicked()
