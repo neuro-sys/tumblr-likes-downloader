@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/bin">
-        <file>tumblr-downloader.exe</file>
+        <file>tumblr-downloader</file>
     </qresource>
 </RCC>
