@@ -23,6 +23,7 @@
 
 #include "tumblrdownloaderworker.h"
 
+#include <QColor>
 #include <QThread>
 #include <iostream>
 #include <QSettings>
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QFont statusFont("Courier New");
     statusFont.setStyleHint(QFont::Monospace);
     ui->statusTextArea->setFont(statusFont);
+    ui->statusTextArea->setTextColor(QColor(0, 64, 0, 255));
 
     ui->targetLocationLineEdit->installEventFilter(this);
     if (ui->targetLocationLineEdit->text().isEmpty()) {
@@ -71,7 +73,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
         ui->pushButton->setText("Cancelling...");
         ui->statusTextArea->append("* Cancelling...");
         tumblrDownloaderWorker->running = false;
-        thread->wait(5000);
+        thread->quit();
+        thread->wait(100);
     }
 
     saveSettings();

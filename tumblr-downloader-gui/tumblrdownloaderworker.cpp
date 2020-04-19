@@ -42,7 +42,6 @@ TumblrDownloaderWorker::~TumblrDownloaderWorker()
 void TumblrDownloaderWorker::run()
 {
     running = true;
-    emit emitStatus("Here...");
 #ifdef Q_OS_WIN
     QFile file(":/bin/tumblr-downloader.exe");
 #else
