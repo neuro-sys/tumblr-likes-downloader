@@ -28,7 +28,9 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/url"
 	"os"
+	"path"
 	"regexp"
 	"strconv"
 	"strings"
@@ -54,7 +56,7 @@ var (
 	debug            bool
 	downloadNoDirs   bool
 
-	reURL = regexp.MustCompile("tumblr_[^\\/]+")
+	reMediaURL = regexp.MustCompile("src=\"([^\"]+)\"")
 )
 
 var lock chan string
@@ -151,21 +153,21 @@ func authTumblr() {
 }
 
 func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
-	path := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=" + strconv.Itoa(limit)
+	urlPath := "http://api.tumblr.com/v2/blog/" + blogIdentifier + "/likes?&api_key=" + consumerKey + "&limit=" + strconv.Itoa(limit)
 
 	if timestamp == 0 {
-		path += "&offset=" + startOffset
+		urlPath += "&offset=" + startOffset
 	}
 
 	if timestamp != 0 {
-		path += "&before=" + strconv.Itoa(timestamp)
+		urlPath += "&before=" + strconv.Itoa(timestamp)
 	}
 
 	if debug {
-		fmt.Println("[DEBUG] - " + path)
+		fmt.Println("[DEBUG] - " + urlPath)
 	}
 
-	resp, err := httpClient.Get(path)
+	resp, err := httpClient.Get(urlPath)
 	checkError(err)
 
 	body, err := ioutil.ReadAll(resp.Body)
@@ -183,9 +185,21 @@ func tumblrGetLikes(blogIdentifier string, timestamp int) *gojq.JQ {
 	return parser
 }
 
+// Check whether the given URL belongs to tumblr.com
+func isTumblr(URL string) bool {
+	parsedURL, err := url.Parse(URL)
+	checkError(err)
+
+	return strings.Contains(parsedURL.Hostname(), "tumblr.com")
+}
+
 func downloadURL(URL string, SubDir string) {
-	fmt.Println("Downloading", URL)
-	fileName := reURL.FindString(URL)
+	fileName := ""
+
+	if isTumblr(URL) {
+		fmt.Println("Downloading", URL)
+		fileName = path.Base(URL)
+	}
 
 	if fileName != "" {
 		var outputFilePath string
@@ -269,6 +283,38 @@ func run() {
 						fmt.Print("[" + strconv.Itoa(counter) + "] ")
 						downloadURL(videoUrl.(string), postBlogName.(string)+string(os.PathSeparator))
 					}
+				} else {
+					postPlayer, err := gojq.NewQuery(v).QueryToArray("player")
+					checkError(err)
+
+					for _, v2 := range postPlayer {
+						url, err := gojq.NewQuery(v2).Query("embed_code")
+						checkError(err)
+
+						switch url.(type) {
+						case string:
+							matches := reMediaURL.FindAllStringSubmatch(url.(string), -1)
+							for _, match := range matches {
+								urlVideo := match[1]
+								fmt.Println("Downloading object from multi-media bundle")
+								downloadURL(urlVideo, postBlogName.(string)+string(os.PathSeparator))
+							}
+						}
+					}
+				}
+			}
+
+			if postType == "text" {
+				postBody, err := gojq.NewQuery(v).Query("body")
+				checkError(err)
+
+				if debug {
+					fmt.Println("Downloading media from text post")
+				}
+				matches := reMediaURL.FindAllStringSubmatch(postBody.(string), -1)
+				for _, match := range matches {
+					urlVideo := match[1]
+					downloadURL(urlVideo, postBlogName.(string)+string(os.PathSeparator))
 				}
 			}
 
