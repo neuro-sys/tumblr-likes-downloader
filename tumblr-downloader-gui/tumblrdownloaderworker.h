@@ -34,8 +34,8 @@ public:
     QProcess *process;
 
 signals:
-    void emitImageURL(const QString &);
-    void receiveTumblrImageURLFinished();
+    void emitStatus(const QString &);
+    void emitFinished();
 
 public slots:
     void run();

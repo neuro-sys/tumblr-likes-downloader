@@ -41,8 +41,8 @@ public:
     bool eventFilter(QObject* object, QEvent* event);
 
 public slots:
-    void receiveTumblrImageURL(const QString &imgURL);
-    void receiveTumblrImageURLFinished();
+    void receiveStatus(const QString &status);
+    void receiveFinished();
 
 private slots:
     void on_pushButton_clicked();
@@ -55,6 +55,7 @@ private:
 
     void saveSettings();
     void loadSettings();
+    void initThread();
 };
 
 #endif // MAINWINDOW_H

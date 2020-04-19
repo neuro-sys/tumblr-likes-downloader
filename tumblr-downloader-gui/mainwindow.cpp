@@ -36,16 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    thread = new QThread(this);
-    tumblrDownloaderWorker = new TumblrDownloaderWorker();
-
-    tumblrDownloaderWorker->moveToThread(thread);
-
-    connect(thread, SIGNAL(started()), tumblrDownloaderWorker, SLOT(run()));
-    connect(tumblrDownloaderWorker, SIGNAL(emitImageURL(QString)), this, SLOT(receiveTumblrImageURL(QString)));
-    connect(tumblrDownloaderWorker, SIGNAL(receiveTumblrImageURLFinished()), this, SLOT(receiveTumblrImageURLFinished()) );
-
     loadSettings();
+    initThread();
 
     QFont statusFont("Courier New");
     statusFont.setStyleHint(QFont::Monospace);
@@ -62,15 +54,24 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::initThread()
+{
+    thread = new QThread(this);
+    tumblrDownloaderWorker = new TumblrDownloaderWorker();
+    tumblrDownloaderWorker->moveToThread(thread);
+
+    connect(thread, SIGNAL(started()), tumblrDownloaderWorker, SLOT(run()));
+    connect(tumblrDownloaderWorker, SIGNAL(emitStatus(QString)), this, SLOT(receiveStatus(QString)));
+    connect(tumblrDownloaderWorker, SIGNAL(emitFinished()), this, SLOT(receiveFinished()) );
+}
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    if (this->thread->isRunning()) {
-        tumblrDownloaderWorker->running = false;
+    if (thread->isRunning()) {
         ui->pushButton->setText("Cancelling...");
         ui->statusTextArea->append("* Cancelling...");
-        this->thread->quit();
-        qApp->processEvents();
-        this->thread->wait();
+        tumblrDownloaderWorker->running = false;
+        thread->wait(5000);
     }
 
     saveSettings();
@@ -120,37 +121,33 @@ void MainWindow::saveSettings()
 
 void MainWindow::on_pushButton_clicked()
 {
-    if (this->thread->isRunning()) {
-        tumblrDownloaderWorker->running = false;
+    if (tumblrDownloaderWorker->running) {
         ui->pushButton->setText("Cancelling...");
         ui->statusTextArea->append("* Cancelling...");
-        this->thread->quit();
-        qApp->processEvents();
-        this->thread->wait();
-        this->thread->exit(0);
+        tumblrDownloaderWorker->running = false;
         ui->pushButton->setText("Download");
     } else {
         saveSettings();
+        initThread();
         thread->start();
+        tumblrDownloaderWorker->running = true;
         ui->pushButton->setText("Cancel");
         ui->statusTextArea->clear();
         ui->statusTextArea->append("* Starting...\n");
     }
 }
 
-void MainWindow::receiveTumblrImageURL(const QString &imgURL)
+void MainWindow::receiveStatus(const QString &status)
 {
-    ui->statusTextArea->insertPlainText(imgURL);
+    ui->statusTextArea->insertPlainText(status);
     ui->statusTextArea->ensureCursorVisible();
 }
 
-void MainWindow::receiveTumblrImageURLFinished()
+void MainWindow::receiveFinished()
 {
     ui->statusTextArea->append("* Finished...");
     ui->pushButton->setText("Download");
-    this->tumblrDownloaderWorker->running = false;
-    this->thread->quit();
-    this->thread->wait();
+    tumblrDownloaderWorker->running = false;
 }
 
 bool MainWindow::eventFilter(QObject* object, QEvent* event)

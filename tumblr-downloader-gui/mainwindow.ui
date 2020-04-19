@@ -208,7 +208,11 @@ p, li { white-space: pre-wrap; }
          </layout>
         </item>
         <item>
-         <widget class="QTextEdit" name="statusTextArea"/>
+         <widget class="QTextEdit" name="statusTextArea">
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -223,7 +227,7 @@ p, li { white-space: pre-wrap; }
      <x>0</x>
      <y>0</y>
      <width>1303</width>
-     <height>27</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>

@@ -25,11 +25,13 @@
 #include <iostream>
 #include <QCoreApplication>
 #include <QFile>
+#include <QThread>
 #include <QTemporaryDir>
 
 TumblrDownloaderWorker::TumblrDownloaderWorker(QObject *parent) : QObject(parent)
 {
     process = new QProcess(this);
+    running = false;
 }
 
 TumblrDownloaderWorker::~TumblrDownloaderWorker()
@@ -39,7 +41,8 @@ TumblrDownloaderWorker::~TumblrDownloaderWorker()
 
 void TumblrDownloaderWorker::run()
 {
-    this->running = true;
+    running = true;
+    emit emitStatus("Here...");
 #ifdef Q_OS_WIN
     QFile file(":/bin/tumblr-downloader.exe");
 #else
@@ -49,29 +52,34 @@ void TumblrDownloaderWorker::run()
     QTemporaryDir dir;
 
     QString targetFilePath = dir.path() + QDir::separator() + fileInfo.fileName();
+    QFile targetFile(targetFilePath);
 
     if (!file.copy(targetFilePath)) {
-        emit emitImageURL("Something went wrong at file: " + QString(__FILE__) + " at func: " + QString(__FUNCTION__));
+        emit emitStatus("Something went wrong at file: " + QString(__FILE__) + " at func: " + QString(__FUNCTION__));
     }
 
-    QFile targetFile(targetFilePath);
     targetFile.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
 
+    emit emitStatus("Starting...");
     process->start(targetFilePath);
     if (!process->waitForReadyRead()) {
-        emit emitImageURL("The process did not start successfully.");
+        emit emitStatus("The process did not start successfully.");
     }
 
     char buf[1024];
     buf[0] = 0;
     do {
+        if (QThread::currentThread()->isInterruptionRequested() || !running) {
+            break;
+        }
         process->readLine(buf, sizeof(buf));
         if (strlen(buf) > 0) {
-            emit emitImageURL(QString::fromLocal8Bit(buf));
+            emit emitStatus(QString::fromLocal8Bit(buf));
         }
         buf[0] = 0;
     } while (!process->waitForFinished(1) && running);
 
+    process->terminate();
     process->kill();
-    emit receiveTumblrImageURLFinished();
+    emit emitFinished();
 }
