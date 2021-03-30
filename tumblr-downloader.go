@@ -1,6 +1,5 @@
 //    Tumblr Downloader is an application that authenticates to your Tumblr
 //    account, and downloads all the liked photos to your computer.
-//    Copyright (C) 2017  Firat Salgur
 //
 //    This file is part of Tumblr Downloader
 //
